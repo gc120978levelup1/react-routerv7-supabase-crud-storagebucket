@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import {
   DropdownMenu,
@@ -101,10 +102,10 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <div className="w-full">
-                <a className="flex flex-row w-full gap-3" href="/logout">
+                <Link className="flex flex-row w-full gap-3" to="/logout">
                   <LogOutIcon />
                   Log out
-                </a>
+                </Link>
               </div>
             </DropdownMenuItem>
           </DropdownMenuContent>
