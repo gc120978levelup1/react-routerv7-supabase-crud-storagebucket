@@ -282,7 +282,7 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
             <div className="flex flex-1 flex-col gap-4 p-1 pt-0">
               <div
                 ref={mapContainerRef}
-                className="relative  w-full h-[70vh] md:h-[75vh] md:w-[90%] md:mx-auto mt-2 rounded-xl bg-muted/50 overflow-auto"
+                className="relative  w-full h-[68vh] md:h-[75vh] md:w-[90%] md:mx-auto mt-2 rounded-xl bg-muted/50 overflow-auto"
               ></div>
             </div>
             <br />
