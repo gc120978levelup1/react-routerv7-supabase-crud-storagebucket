@@ -191,7 +191,7 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
       <ul className=" flex flex-col">
         <div>
           <h1 className="flex flex-row">
-            <p className=" ml-30 mr-auto w-fit">Job Order Data</p>
+            <p className=" ml-0 md:ml-30 mr-auto w-fit">Job Order Data</p>
             <a
               className=" flex flex-row gap-2 ml-auto mr-30 px-3 rounded-lg border-2 bg-green-950 hover:text-blue-200 hover:font-extrabold hover:bg-amber-700 hover:cursor-pointer hover:border-4"
               href={`/JO_show/${loaderData.joId}`}
