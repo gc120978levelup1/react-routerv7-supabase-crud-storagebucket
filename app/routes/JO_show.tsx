@@ -217,7 +217,7 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
               </div>
             </div>
             <br />
-            <Card className=" mx-5 md:mx-20 my-auto">
+            <Card className=" mx-0 w-full p-0 md:mx-20 my-auto">
               <CardHeader>
                 <CardTitle className=" flex flex-row gap-3">
                   <Eye />
@@ -226,7 +226,7 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
                 <CardDescription>Show item on crews table</CardDescription>
                 <CardAction></CardAction>
               </CardHeader>
-              <CardContent className=" bg-gray-900/30 py-10 m-2">
+              <CardContent className=" bg-gray-900/30 p-0 py-10 m-2">
                 <div className="mx-auto gap-6 flex flex-row flex-wrap">
                   <div>
                     <Label htmlFor="nearAccountNumber">nearAccountNumber</Label>
@@ -344,7 +344,7 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
                 <Label className="mb-2" htmlFor="afterpicture2">
                         Location Map of the Job Order
                       </Label>
-                <div className="flex flex-1 flex-col gap-4 p-1 pt-0">
+                <div className="flex flex-1 flex-col gap-4 p-1 pt-0 w-full">
                   <div
                     ref={mapContainerRef}
                     className="relative  w-full h-[60vh] md:h-[75vh] md:mx-auto mt-2 rounded-xl bg-muted/50 overflow-auto"
