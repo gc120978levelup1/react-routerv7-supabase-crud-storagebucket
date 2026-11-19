@@ -21,6 +21,7 @@ export default [
         route("JO_new","routes/JO_new.tsx"),
         route("JO_master","routes/JO_master.tsx"),
         route("JO_show/:id","routes/JO_show.tsx"),
+        route("JO_edit/:id","routes/JO_edit.tsx"),
         route("JO_delete/:id","routes/JO_delete.tsx"),
         route("JO_add_before_picture1/:id","routes/JO_add_before_picture1.tsx"),
         route("JO_add_before_picture2/:id","routes/JO_add_before_picture2.tsx"),

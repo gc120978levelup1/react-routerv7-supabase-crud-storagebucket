@@ -47,13 +47,15 @@ export function meta({}: Route.MetaArgs) {
 export async function clientLoader({ params }: Route.LoaderArgs) {
   // middleware to guard route from unauthorized entry
   const { supabase, headers } = createClientSPA();
+  // donot need login
+  /*
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) {
     return redirect("/login");
   }
-
+  */
   // main query code
   const {
     data: todos,
@@ -83,6 +85,8 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
   const refLon = useRef<HTMLInputElement | null>(null);
   const [JOLat, setJOLat] = useState(0.0);
   const [JOLon, setJOLon] = useState(0.0);
+  const scrollhereRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
     // retreive GPS JSON data from local storage
     const settings = JSON.parse(
@@ -167,6 +171,7 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
               `);
         });
       });
+    scrollhereRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
   return (
     <>
@@ -177,7 +182,7 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
             <BreadcrumbList>
               <BreadcrumbSeparator className="hidden md:block" />
               <BreadcrumbItem>
-                <BreadcrumbPage>Personnel Data - Show Item</BreadcrumbPage>
+                <BreadcrumbPage>Job Order - Assign GIS Geo Tag</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -186,13 +191,13 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
       <ul className=" flex flex-col">
         <div>
           <h1 className="flex flex-row">
-            <p className=" ml-30 mr-auto w-fit">My Personnel Data</p>
+            <p className=" ml-30 mr-auto w-fit">Job Order Data</p>
             <a
               className=" flex flex-row gap-2 ml-auto mr-30 px-3 rounded-lg border-2 bg-green-950 hover:text-blue-200 hover:font-extrabold hover:bg-amber-700 hover:cursor-pointer hover:border-4"
-              href={`/personnel_data_update`}
+              href={`/JO_show/${loaderData.joId}`}
             >
               <ListPlus />
-              Update Personnel Data
+              Back to Main Job Order Interface
             </a>
           </h1>
         </div>
@@ -269,7 +274,7 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
             </Card>
             <br />
             <h1 className="flex flex-row">
-              <p className=" md:ml-30 mx-auto w-fit">
+              <p ref={scrollhereRef} className=" md:ml-30 mx-auto w-fit">
                 Double Click on the map to assign location and click submit
                 button
               </p>
@@ -288,7 +293,7 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
               className="flex flex-col mx-3 lg:mx-20"
             >
               <div className="flex flex-col lg:flex-row flex-wrap gap-6">
-                <div className="flex flex-col">
+                <div className="hidden md:flex md:flex-col">
                   <Label htmlFor="ylat">&nbsp;&nbsp;Latitude (Y)</Label>
                   <Input
                     ref={refLat}
@@ -298,7 +303,7 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
                     defaultValue={JOLat}
                   />
                 </div>
-                <div className="flex flex-col">
+                <div className="hidden md:flex md:flex-col">
                   <Label htmlFor="xlon">&nbsp;&nbsp;Longitude (X)</Label>
                   <Input
                     ref={refLon}

@@ -55,8 +55,14 @@ export async function clientAction({ request }: ActionFunctionArgs) {
   const dateNew = new Date();
   //const dateNew = now.toString();
   const { supabase } = createClientSPA();
-  const { error } = await supabase.from("jobs").insert({ nearAccountNumber, description, status, dateNew });
-  return redirect(`/`);
+  const { error, data: todos } = await supabase
+    .from("jobs")
+    .insert({ nearAccountNumber, description, status, dateNew })
+    .select("id")
+    .single();
+  if (!error) {
+    return redirect(`/JO_show/${todos.id}`);
+  }
 }
 
 export default function JONew() {
@@ -94,11 +100,19 @@ export default function JONew() {
             <div className="mx-10 gap-6 flex flex-col">
               <div className="flex flex-col gap-2">
                 <Label htmlFor="nearAccountNumber">nearAccountNumber</Label>
-                <Input type="text" name="nearAccountNumber" id="nearAccountNumber" />
+                <Input
+                  type="text"
+                  name="nearAccountNumber"
+                  id="nearAccountNumber"
+                />
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="description">description</Label>
-                <Textarea name="description" id="description" />
+                <Textarea
+                  className=" grow mt-2 text-2xl h-50"
+                  name="description"
+                  id="description"
+                />
               </div>
             </div>
           </CardContent>

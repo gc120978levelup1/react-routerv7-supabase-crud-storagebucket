@@ -66,7 +66,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
             <BreadcrumbList>
               <BreadcrumbSeparator className="hidden md:block" />
               <BreadcrumbItem>
-                <BreadcrumbPage>Table 1 Master List</BreadcrumbPage>
+                <BreadcrumbPage>Job Order - Master List</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -77,7 +77,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         <p className=" ml-30 mr-auto w-fit">Items Masterlist</p>
         <a
           className=" flex flex-row gap-2 ml-auto mr-30 px-3 rounded-lg border-2 bg-green-950 hover:text-blue-200 hover:font-extrabold hover:bg-amber-700 hover:cursor-pointer hover:border-4"
-          href={`/add`}
+          href={`/JO_new`}
         >
           <ListPlus />
           Add

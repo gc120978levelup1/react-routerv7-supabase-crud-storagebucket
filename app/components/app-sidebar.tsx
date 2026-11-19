@@ -281,12 +281,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
         // check if the gps signal is first time
         // if first time signal then execute commands
-        console.log("garry gps accuracy ",accuracy);
-        const gps_accuracy_limit = 200;//meters
+        console.log("garry gps accuracy ", accuracy);
+        const gps_accuracy_limit = 200; //meters
         if (accuracy > gps_accuracy_limit) gpsDataAvailable.current = true;
         if (!gpsDataAvailable.current) {
           console.log("garry first time gps data...");
-          console.log("garry gps accuracy ",accuracy);
+          console.log("garry gps accuracy ", accuracy);
           save_user_gps_data();
           subscribe_to_user_data();
           subscribe_to_user_duty_status();
@@ -396,12 +396,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroupLabel>
-          <div className="ml-2 text-sm">
-            Duty Status:&nbsp;&nbsp;
-            <span className=" font-extrabold text-green-500 text-lg">
-              {duty_status.status}
-            </span>
-          </div>
+          <a href="/personnel_duty_status_update">
+            <div className="ml-2 text-sm">
+              Duty Status:&nbsp;&nbsp;
+              <span className=" font-extrabold text-green-500 text-lg">
+                {duty_status.status}
+              </span>
+            </div>
+          </a>
         </SidebarGroupLabel>
         <NavMain items={data.navMain} />
         <NavProjects projects={data.projects} />

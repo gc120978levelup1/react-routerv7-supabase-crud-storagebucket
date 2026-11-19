@@ -5,6 +5,27 @@ import "leaflet/styles.css";
 
 // this specific page component import
 // specific component import
+import * as React from "react";
+import { format } from "date-fns";
+import { ChevronDownIcon } from "lucide-react";
+import { Button } from "~/components/ui/button";
+import { Textarea } from "~/components/ui/textarea";
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "~/components/ui/combobox";
+
+import { Calendar } from "~/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "~/components/ui/popover";
+
 import { Label } from "~/components/ui/label";
 import { Input } from "~/components/ui/input";
 import {
@@ -17,6 +38,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { ListPlus, Eye, PencilLine, ListX } from "lucide-react";
+import { UserRoundStar, Save } from "lucide-react";
 
 // usual component import
 import {
@@ -32,7 +54,7 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 // rrv7 import
 import type { Route } from "./+types/JO_show";
 import { createClientSPA } from "../lib/supabase.client.spa";
-import { redirect } from "react-router";
+import { Form, type ActionFunctionArgs, redirect } from "react-router";
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Personnel Data" },
@@ -58,7 +80,23 @@ export async function clientLoader({ params }: Route.LoaderArgs) {
   return { todos, count };
 }
 
+export async function clientAction({ params, request }: ActionFunctionArgs) {
+  const formData = await request.formData();
+  const dateFinished = formData.get("dateFinished");
+  const dateReported = new Date();
+  const jobtype = formData.get("jobtype") as string;
+  const reportDescription = formData.get("reportDescription") as string;
+  const { supabase } = createClientSPA();
+  const { error } = await supabase
+    .from("jobs")
+    .update({ jobtype, dateFinished, dateReported, reportDescription })
+    .eq("id", params.id);
+  return redirect(`/JO_show/${params.id}`);
+}
+
 export default function PersonnelData({ loaderData }: Route.ComponentProps) {
+  const frameworks = ["ISD", "MNT", "CONST", "LIVELINE"] as const;
+  const [date, setDate] = React.useState<Date>();
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<LeafletMap | null>(null);
   const [JOLat, setJOLat] = useState(0.0);
@@ -147,18 +185,25 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
               <div className="flex flex-col gap-2">
                 <h1 className="flex flex-col md:flex-row gap-2">
                   <a
-                    className=" flex flex-row gap-2 ml-2 mr-3 px-3 rounded-lg border-2 bg-green-950 hover:text-blue-200 hover:font-extrabold hover:bg-amber-700 hover:cursor-pointer hover:border-4"
+                    className=" flex flex-row text-center  gap-2 ml-2 mr-3 px-3 rounded-lg border-2 bg-green-950 hover:text-blue-200 hover:font-extrabold hover:bg-amber-700 hover:cursor-pointer hover:border-4"
                     href={`/JO_add_after_picture1/${todo.id}`}
                   >
                     <ListPlus />
                     After Image 1
                   </a>
                   <a
-                    className=" flex flex-row gap-2 ml-2 mr-3 md:mr-30 px-3 rounded-lg border-2 bg-green-950 hover:text-blue-200 hover:font-extrabold hover:bg-amber-700 hover:cursor-pointer hover:border-4"
+                    className=" flex flex-row text-center  gap-2 ml-2 mr-3 md:mr-3 px-3 rounded-lg border-2 bg-green-950 hover:text-blue-200 hover:font-extrabold hover:bg-amber-700 hover:cursor-pointer hover:border-4"
                     href={`/JO_add_after_picture2/${todo.id}`}
                   >
                     <ListPlus />
                     After Image 2
+                  </a>
+                  <a
+                    className="flex flex-row text-center gap-2 ml-2 mr-3 md:mr-30 px-3 rounded-lg border-2 bg-green-950 hover:text-blue-200 hover:font-extrabold hover:bg-amber-700 hover:cursor-pointer hover:border-4"
+                    href={`/JO_show/${todo.id}`}
+                  >
+                    <ListPlus />
+                    Back to Main Job Order Interface
                   </a>
                 </h1>
               </div>
@@ -215,27 +260,84 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
                       {todo.description}
                     </p>
                   </div>
-                  <div>
-                    <Label htmlFor="dateFinished">dateFinished</Label>
-                    <p className=" font-extrabold text-lg">
-                      {todo.dateFinished}
-                    </p>
-                  </div>
-                  <div>
+                  <div className="hidden">
                     <Label htmlFor="dateReported">dateReported</Label>
                     <p className=" font-extrabold text-lg">
                       {todo.dateReported}
                     </p>
                   </div>
-                  <div>
-                    <Label htmlFor="jobtype">jobtype</Label>
-                    <p className=" font-extrabold text-lg">{todo.jobtype}</p>
-                  </div>
-                  <div>
-                    <Label htmlFor="reportDescription">reportDescription</Label>
-                    <p className=" font-extrabold text-lg">
-                      {todo.reportDescription}
-                    </p>
+                  <div className="w-full">
+                    <Form
+                      method="post"
+                      encType="multipart/form-data"
+                      className="flex flex-col"
+                    >
+                      <div className="flex flex-col md:flex-row md:flex-wrap gap-5">
+                        <div className="h-10 w-full md:w-[48%]">
+                          <Label htmlFor="dateFinished">dateFinished</Label>
+                          <p className=" hidden font-extrabold text-lg">
+                            {todo.dateFinished}
+                          </p>
+                          <Input
+                            className=" h-10 w-full"
+                            type="date"
+                            name="dateFinished"
+                            id="dateFinished"
+                            defaultValue={todo.dateFinished}
+                          />
+                        </div>
+
+                        <div className="h-10 w-full md:w-[48%]">
+                          <Label htmlFor="jobtype">jobtype</Label>
+                          <p className=" hidden font-extrabold text-lg">
+                            {todo.jobtype}
+                          </p>
+                          <Combobox
+                            items={frameworks}
+                            id="jobtype"
+                            name="jobtype"
+                            defaultValue={todo.jobtype}
+                          >
+                            <ComboboxInput placeholder="Select Job Order Type" />
+                            <ComboboxContent>
+                              <ComboboxEmpty>No items found.</ComboboxEmpty>
+                              <ComboboxList>
+                                {(item) => (
+                                  <ComboboxItem key={item} value={item}>
+                                    {item}
+                                  </ComboboxItem>
+                                )}
+                              </ComboboxList>
+                            </ComboboxContent>
+                          </Combobox>
+                        </div>
+
+                        <div className="w-full gap-6">
+                          <Label htmlFor="reportDescription">
+                            reportDescription
+                          </Label>
+                          <p className=" hidden font-extrabold text-lg">
+                            {todo.reportDescription}
+                          </p>
+                          <Textarea
+                            className=" grow mt-2 text-2xl h-50"
+                            placeholder="Type your message here."
+                            id="reportDescription"
+                            name="reportDescription"
+                            defaultValue={todo.reportDescription}
+                          />
+                        </div>
+                        <div className=" ml-auto">
+                          <button
+                            className=" flex flex-row gap-2 mx-auto my-0 rounded-lg border-2 p-3 bg-green-950 hover:text-blue-200 hover:font-extrabold hover:bg-amber-700 hover:cursor-pointer hover:border-4"
+                            type="submit"
+                          >
+                            <Save />
+                            Yes, Upload
+                          </button>
+                        </div>
+                      </div>
+                    </Form>
                   </div>
                   <div className="flex flex-col md:flex-row flex-wrap gap-2">
                     <div>
@@ -284,10 +386,10 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
                     <a href=""></a>
                   </p>
                 </div>
-                <div className="flex flex-1 flex-col gap-4 p-1 pt-0">
+                <div className="flex flex-1 flex-col gap-4 p-1 pt-0 w-full">
                   <div
                     ref={mapContainerRef}
-                    className="relative  w-full h-[60vh] md:h-[75vh] md:w-[90%] md:mx-auto mt-2 rounded-xl bg-muted/50 overflow-auto"
+                    className="relative  w-full h-[60vh] md:h-[75vh] md:mx-auto mt-2 rounded-xl bg-muted/50 overflow-auto"
                   ></div>
                 </div>
                 <a

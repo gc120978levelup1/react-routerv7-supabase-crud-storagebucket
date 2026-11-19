@@ -187,6 +187,13 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
                   </a>
                   <a
                     className=" flex flex-row gap-2 ml-2 mr-3 px-3 rounded-lg border-2 bg-green-950 hover:text-blue-200 hover:font-extrabold hover:bg-amber-700 hover:cursor-pointer hover:border-4"
+                    href={`/JO_edit/${todo.id}`}
+                  >
+                    <ListPlus />
+                    Edit Inputs
+                  </a>
+                  <a
+                    className=" flex flex-row gap-2 ml-2 mr-3 px-3 rounded-lg border-2 bg-green-950 hover:text-blue-200 hover:font-extrabold hover:bg-amber-700 hover:cursor-pointer hover:border-4"
                     href={`/JO_assign_crew/${todo.id}`}
                   >
                     <ListPlus />
@@ -231,6 +238,19 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
                     <Label htmlFor="dateNew">dateNew</Label>
                     <p className=" font-extrabold text-lg">{todo.dateNew}</p>
                   </div>
+
+                  <div>
+                    <Label htmlFor="dateAssigned">dateAssigned</Label>
+                    <p className=" font-extrabold text-lg">
+                      {todo.dateAssigned}
+                    </p>
+                  </div>
+                  <div>
+                    <Label htmlFor="dateAccepted">dateAccepted</Label>
+                    <p className=" font-extrabold text-lg">
+                      {todo.dateAccepted}
+                    </p>
+                  </div>
                   <div>
                     <Label htmlFor="status">status</Label>
                     <p className=" font-extrabold text-lg">{todo.status}</p>
@@ -244,16 +264,11 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
                     </a>
                   </div>
                   <div>
-                    <Label htmlFor="dateAssigned">dateAssigned</Label>
+                    <Label htmlFor="description">description</Label>
                     <p className=" font-extrabold text-lg">
-                      {todo.dateAssigned}
+                      {todo.description}
                     </p>
-                  </div>
-                  <div>
-                    <Label htmlFor="dateAccepted">dateAccepted</Label>
-                    <p className=" font-extrabold text-lg">
-                      {todo.dateAccepted}
-                    </p>
+                    <p></p>
                   </div>
                   <div>
                     <Label htmlFor="dateFinished">dateFinished</Label>
@@ -277,12 +292,7 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
                       {todo.reportDescription}
                     </p>
                   </div>
-                  <div>
-                    <Label htmlFor="description">description</Label>
-                    <p className=" font-extrabold text-lg">
-                      {todo.description}
-                    </p>
-                  </div>
+
                   <div className="flex flex-col md:flex-row flex-wrap gap-2">
                     <div>
                       <Label className="mb-2" htmlFor="beforepicture1">
@@ -330,10 +340,14 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
                     <a href=""></a>
                   </p>
                 </div>
+                <br />
+                <Label className="mb-2" htmlFor="afterpicture2">
+                        Location Map of the Job Order
+                      </Label>
                 <div className="flex flex-1 flex-col gap-4 p-1 pt-0">
                   <div
                     ref={mapContainerRef}
-                    className="relative  w-full h-[60vh] md:h-[75vh] md:w-[90%] md:mx-auto mt-2 rounded-xl bg-muted/50 overflow-auto"
+                    className="relative  w-full h-[60vh] md:h-[75vh] md:mx-auto mt-2 rounded-xl bg-muted/50 overflow-auto"
                   ></div>
                 </div>
                 <a

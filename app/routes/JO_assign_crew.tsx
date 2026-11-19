@@ -44,6 +44,7 @@ import {
 import { SidebarTrigger } from "~/components/ui/sidebar";
 
 // rrv7 import
+import { useEffect, useRef, useState } from "react";
 import type { Route } from "./+types/JO_assign_crew";
 import { createClientSPA } from "../lib/supabase.client.spa";
 import { redirect } from "react-router";
@@ -75,6 +76,10 @@ export async function clientLoader({ params }: Route.LoaderArgs) {
 }
 
 export default function PersonnelData({ loaderData }: Route.ComponentProps) {
+  const scrollhereRef = useRef<HTMLDivElement | null>(null);
+  useEffect(()=>{
+    scrollhereRef.current?.scrollIntoView({ behavior: "smooth" });
+  })
   return (
     <>
       <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
@@ -84,7 +89,7 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
             <BreadcrumbList>
               <BreadcrumbSeparator className="hidden md:block" />
               <BreadcrumbItem>
-                <BreadcrumbPage>Personnel Data - Show Item</BreadcrumbPage>
+                <BreadcrumbPage>Job Order - Assign A Crew</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -93,13 +98,13 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
       <ul className=" flex flex-col">
         <div>
           <h1 className="flex flex-row">
-            <p className=" ml-30 mr-auto w-fit">My Personnel Data</p>
+            <p className=" ml-30 mr-auto w-fit">Job Order Data</p>
             <a
               className=" flex flex-row gap-2 ml-auto mr-30 px-3 rounded-lg border-2 bg-green-950 hover:text-blue-200 hover:font-extrabold hover:bg-amber-700 hover:cursor-pointer hover:border-4"
-              href={`/personnel_data_update`}
+              href={`/JO_show/${loaderData.joId}`}
             >
               <ListPlus />
-              Update Personnel Data
+              Back to Main Job Order Interface
             </a>
           </h1>
         </div>
@@ -179,7 +184,7 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
       </ul>
       <br />
       <h1 className="flex flex-row">
-        <p className=" ml-30 mr-auto w-fit">
+        <p ref={scrollhereRef}  className=" ml-30 mr-auto w-fit">
           Select Working Crews from this Masterlist
         </p>
       </h1>

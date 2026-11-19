@@ -40,9 +40,9 @@ import {
 import { SidebarTrigger } from "~/components/ui/sidebar";
 
 // rrv7 import
-import type { Route } from "./+types/JO_show";
+import type { Route } from "./+types/JO_crew_accept";
 import { createClientSPA } from "../lib/supabase.client.spa";
-import { Form, redirect, type ActionFunctionArgs, } from "react-router";
+import { Form, redirect, type ActionFunctionArgs } from "react-router";
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Personnel Data" },
@@ -65,7 +65,9 @@ export async function clientLoader({ params }: Route.LoaderArgs) {
     count,
     error,
   } = await supabase.from("jobs").select("*").eq("id", params.id);
-  return { todos, count };
+  if (!error) {
+    return { todos, count, joId: todos[0].id };
+  }
 }
 
 export async function clientAction({ params, request }: ActionFunctionArgs) {
@@ -100,11 +102,15 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
   const mapInstanceRef = useRef<LeafletMap | null>(null);
   const [JOLat, setJOLat] = useState(0.0);
   const [JOLon, setJOLon] = useState(0.0);
+  const scrollhereRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
     // ensure that Leaflet map initialization should be done once
+    if (!loaderData!.todos![0].ylat) return;
+    if (!loaderData!.todos![0].xlon) return;
     if (!mapContainerRef.current || mapInstanceRef.current) return;
     mapInstanceRef.current = new LeafletMap(mapContainerRef.current).setView(
-      [loaderData.todos![0].ylat, loaderData.todos![0].xlon],
+      [loaderData!.todos![0].ylat, loaderData!.todos![0].xlon],
       18,
     );
 
@@ -141,7 +147,7 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
 
     // JO Marker
     const JOMarker = new Marker(
-      [loaderData.todos![0].ylat, loaderData.todos![0].xlon],
+      [loaderData!.todos![0].ylat, loaderData!.todos![0].xlon],
       {
         alt: `JO Marker`,
       },
@@ -160,6 +166,7 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
         permanent: true,
         direction: "top",
       });
+    scrollhereRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
   return (
     <>
@@ -170,7 +177,7 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
             <BreadcrumbList>
               <BreadcrumbSeparator className="hidden md:block" />
               <BreadcrumbItem>
-                <BreadcrumbPage>Personnel Data - Show Item</BreadcrumbPage>
+                <BreadcrumbPage>Job Order - Acceptance</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -179,18 +186,18 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
       <ul className=" flex flex-col">
         <div>
           <h1 className="flex flex-row">
-            <p className=" ml-30 mr-auto w-fit">My Personnel Data</p>
+            <p className=" ml-30 mr-auto w-fit">Job Order Data</p>
             <a
               className=" flex flex-row gap-2 ml-auto mr-30 px-3 rounded-lg border-2 bg-green-950 hover:text-blue-200 hover:font-extrabold hover:bg-amber-700 hover:cursor-pointer hover:border-4"
-              href={`/personnel_data_update`}
+              href={`/JO_show/${loaderData!.joId}`}
             >
               <ListPlus />
-              Update Personnel Data
+              Back to Main Job Order Interface
             </a>
           </h1>
         </div>
         <br />
-        {loaderData.todos?.map((todo) => (
+        {loaderData!.todos?.map((todo) => (
           <li key={todo.id}>
             <Card className=" mx-5 md:mx-20 my-auto">
               <CardHeader>
@@ -284,6 +291,9 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
                 >
                   See in Street View
                 </a>
+                <p ref={scrollhereRef} className=" ml-10 mr-auto w-fit">
+                  Please decide whether to accept or reject the Job Order
+                </p>
                 <Form
                   method="post"
                   encType="multipart/form-data"
@@ -324,7 +334,7 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
                       className="lg:ml-auto border-2 p-3 max-h-20 cursor-pointer hover:bg-gray-800"
                       type="submit"
                     >
-                      Accept Job
+                      Submit Decision
                     </Button>
                   </div>
                 </Form>
