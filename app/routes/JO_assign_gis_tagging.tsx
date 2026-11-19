@@ -246,8 +246,16 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
                     </p>
                   </div>
                   <div>
+                    <a
+                      className=" flex flex-row gap-2 ml-2 md:ml-auto mr-3 px-3 rounded-lg border-2 bg-green-950 hover:text-blue-200 hover:font-extrabold hover:bg-amber-700 hover:cursor-pointer hover:border-4"
+                      href={`/JO_add_before_picture1/${todo.id}`}
+                    >
+                      <ListPlus />
+                      add a photo
+                    </a>
+
                     <Label className="mb-2" htmlFor="beforepicture1">
-                      beforepicture1
+                      beforepicture2
                     </Label>
                     <img
                       src={todo.beforepicture1}
@@ -256,6 +264,13 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
                     />
                   </div>
                   <div>
+                    <a
+                      className=" flex flex-row gap-2 ml-2 md:ml-auto mr-3 px-3 rounded-lg border-2 bg-green-950 hover:text-blue-200 hover:font-extrabold hover:bg-amber-700 hover:cursor-pointer hover:border-4"
+                      href={`/JO_add_before_picture2/${todo.id}`}
+                    >
+                      <ListPlus />
+                      add a photo
+                    </a>
                     <Label className="mb-2" htmlFor="beforepicture2">
                       beforepicture2
                     </Label>

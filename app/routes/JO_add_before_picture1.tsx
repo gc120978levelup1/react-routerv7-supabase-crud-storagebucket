@@ -41,16 +41,9 @@ export function meta({}: Route.MetaArgs) {
 }
 export async function clientLoader({ params }: Route.LoaderArgs) {
   // middleware to guard route from unauthorized entry
-  const { supabase, headers } = createClientSPA();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return redirect("/login");
-  }
-
+  
   // main query code
-  return { user, joId: params.id };
+  return { joId: params.id };
 }
 
 export async function clientAction({ params, request }: ActionFunctionArgs) {
@@ -129,10 +122,7 @@ export default function AvatPicture({ loaderData }: Route.ComponentProps) {
               <BreadcrumbSeparator className="hidden md:block" />
               <BreadcrumbItem>
                 <BreadcrumbPage>
-                  Job Order - Before Picture 1, User Email:{" "}
-                  <span className=" p-2 bg-blue-950 font-extrabold">
-                    {loaderData.user.email}
-                  </span>
+                  Job Order - Before Picture 1
                 </BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
@@ -145,7 +135,7 @@ export default function AvatPicture({ loaderData }: Route.ComponentProps) {
           <p className=" ml-30 mr-auto w-fit">Job Order Data</p>
           <a
             className=" flex flex-row gap-2 ml-auto mr-30 px-3 rounded-lg border-2 bg-green-950 hover:text-blue-200 hover:font-extrabold hover:bg-amber-700 hover:cursor-pointer hover:border-4"
-            href={`/JO_show/${loaderData.joId}`}
+            href="javascript:history.back()"
           >
             <ListPlus />
             Back to Main Job Order Interface
@@ -165,7 +155,7 @@ export default function AvatPicture({ loaderData }: Route.ComponentProps) {
               Upload Before Picture 1
             </CardTitle>
             <CardDescription>
-              Edit User: {loaderData.user.email} Display Avatar
+              Photo upload
             </CardDescription>
             <CardAction></CardAction>
           </CardHeader>
