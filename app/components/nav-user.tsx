@@ -1,4 +1,3 @@
-import { Link } from "react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import {
   DropdownMenu,
@@ -16,8 +15,10 @@ import {
   useSidebar,
 } from "~/components/ui/sidebar";
 import {
-  EllipsisVerticalIcon,
-  CircleUserRoundIcon,
+  Forklift,
+  ChevronsUpDownIcon,
+  SparklesIcon,
+  BadgeCheckIcon,
   CreditCardIcon,
   BellIcon,
   LogOutIcon,
@@ -44,18 +45,16 @@ export function NavUser({
           >
             <Avatar className="size-8 rounded-lg grayscale">
               <AvatarImage src={user.avatar} alt={user.name} />
-              <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+              <AvatarFallback>CN</AvatarFallback>
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight">
               <span className="truncate font-medium">{user.name}</span>
-              <span className="truncate text-xs text-foreground/70">
-                {user.email}
-              </span>
+              <span className="truncate text-xs">{user.email}</span>
             </div>
-            <EllipsisVerticalIcon className="ml-auto size-4" />
+            <ChevronsUpDownIcon className="ml-auto size-4" />
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="min-w-56"
+            className="w-fit"
             side={isMobile ? "bottom" : "right"}
             align="end"
             sideOffset={4}
@@ -63,15 +62,13 @@ export function NavUser({
             <DropdownMenuGroup>
               <DropdownMenuLabel className="p-0 font-normal">
                 <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                  <Avatar className="size-8">
+                  <Avatar>
                     <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                    <AvatarFallback>CN</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-medium">{user.name}</span>
-                    <span className="truncate text-xs text-muted-foreground">
-                      {user.email}
-                    </span>
+                    <span className="truncate text-xs">{user.email}</span>
                   </div>
                 </div>
               </DropdownMenuLabel>
@@ -79,34 +76,53 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <div className="w-full">
-                  <a className="flex flex-row w-full gap-3" href="/password">
-                    <CircleUserRoundIcon />
-                    Account
-                  </a>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <div className="w-full">
-                  <a className="flex flex-row w-full gap-3" href="/avat_picture">
-                    <CreditCardIcon />
-                    Change Picture
-                  </a>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <BellIcon />
-                Notifications
+                <a className="flex flex-row gap-2 w-full" href="/password">
+                  <SparklesIcon />
+                  Change Password
+                </a>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem>
+                <a className="flex flex-row gap-2 w-full" href="/user_display">
+                  <BadgeCheckIcon />
+                  Change User Display Name
+                </a>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <a className="flex flex-row gap-2 w-full" href="/avat_picture">
+                  <CreditCardIcon />
+                  Change User Avatar
+                </a>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <a
+                  className="flex flex-row gap-2 w-full"
+                  href="/personnel_data"
+                >
+                  <BellIcon />
+                  Personnel Data
+                </a>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <a
+                  className="flex flex-row gap-2 w-full"
+                  href="/personnel_duty_status_update"
+                >
+                  <Forklift />
+                  Update Duty Status
+                </a>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+
+            <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <div className="w-full">
-                <Link className="flex flex-row w-full gap-3" to="/logout">
-                  <LogOutIcon />
-                  Log out
-                </Link>
-              </div>
+              <a className="flex flex-row gap-2 w-full" href="/logout">
+                <LogOutIcon />
+                Log out
+              </a>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

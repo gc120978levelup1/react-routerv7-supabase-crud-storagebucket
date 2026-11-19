@@ -19,7 +19,8 @@ export function meta({}: Route.MetaArgs) {
     { name: "description", content: "Page for User to Login" },
   ];
 }
-export async function clientLoader({ params }: Route.LoaderArgs) { //on_load_page
+export async function clientLoader({ params }: Route.LoaderArgs) {
+  //on_load_page
   // middleware to guard route from unauthorized entry
   const { supabase, headers } = createClientSPA();
   const {
@@ -31,15 +32,41 @@ export async function clientLoader({ params }: Route.LoaderArgs) { //on_load_pag
 
   // main query code
 }
-export async function clientAction({ params, request }: ActionFunctionArgs) { //on_Form_submit
+export async function clientAction({ params, request }: ActionFunctionArgs) {
+  //on_Form_submit
   const formData = await request.formData();
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const { supabase } = createClientSPA();
-  const { data, error } = await supabase.auth.signInWithPassword({
+  const { error } = await supabase.auth.signInWithPassword({
     email: email,
     password: password,
   });
+
+  // save changes in user settings to local storage
+  if (!error) {
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+    if (userError) {
+      console.error(userError.message);
+      return;
+    }
+    if (!user) {
+      return;
+    }
+    const path = `${user.id}/avatar`;
+    const { data } = supabase.storage.from("images").getPublicUrl(path);
+
+    // store JSON to local storage
+    localStorage.setItem("userSettings1234567890", JSON.stringify({
+      name: user.user_metadata?.display_name,
+      email: user.email,
+      avatar: data.publicUrl,
+    }));
+  }
+
   if (!error) return redirect(`/`);
 }
 
@@ -50,7 +77,7 @@ export default function Login({ loaderData }: Route.ComponentProps) {
         <div className={cn("flex flex-col gap-6", "")}>
           <Card className="overflow-hidden p-0">
             <CardContent className="grid p-0 md:grid-cols-2">
-              <Form  method="post"  className="p-6 md:p-8">
+              <Form method="post" className="p-6 md:p-8">
                 <FieldGroup>
                   <div className="flex flex-col items-center gap-2 text-center">
                     <h1 className="text-2xl font-bold">Welcome back</h1>
@@ -61,7 +88,8 @@ export default function Login({ loaderData }: Route.ComponentProps) {
                   <Field>
                     <FieldLabel htmlFor="email">Email</FieldLabel>
                     <Input
-                      name="email" id="email"
+                      name="email"
+                      id="email"
                       type="email"
                       placeholder="m@example.com"
                       required
@@ -77,7 +105,12 @@ export default function Login({ loaderData }: Route.ComponentProps) {
                         Forgot your password?
                       </a>
                     </div>
-                    <Input name="password" id="password" type="password" required />
+                    <Input
+                      name="password"
+                      id="password"
+                      type="password"
+                      required
+                    />
                   </Field>
                   <Field>
                     <Button type="submit">Login</Button>

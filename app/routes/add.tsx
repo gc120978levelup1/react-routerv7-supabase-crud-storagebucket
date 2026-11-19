@@ -1,3 +1,30 @@
+// this specific page component import
+// specific component import
+import { Label } from "~/components/ui/label";
+import { Input } from "~/components/ui/input";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
+import { ListPlus, Save } from "lucide-react";
+
+// usual component import
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "~/components/ui/breadcrumb";
+import { SidebarTrigger } from "~/components/ui/sidebar";
+
+// rrv7 import
 import type { Route } from "./+types/add";
 import { Form, type ActionFunctionArgs, redirect } from "react-router";
 import { createClientSPA } from "../lib/supabase.client.spa";
@@ -18,7 +45,6 @@ export async function clientLoader({ request }: Route.ClientLoaderArgs) {
   }
 
   // main query code
-
 }
 export async function clientAction({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
@@ -32,19 +58,59 @@ export async function clientAction({ request }: ActionFunctionArgs) {
 export default function Add() {
   return (
     <>
-      <h1>Add New Item</h1>
-      <Form method="post" className="flex flex-col">
-        <div className="flex flex-row gap-2">
-          <label htmlFor="name">name</label>
-          <input type="text" name="name" id="name" />
+      <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+        <div className="flex items-center gap-2 px-4">
+          <SidebarTrigger className="-ml-1" />
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbSeparator className="hidden md:block" />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Table 1 - Add Item</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
         </div>
-        <div className="flex flex-row gap-2">
-          <label htmlFor="age">age</label>
-          <input type="number" name="age" id="age" />
-        </div>
-        <div className=" mt-2">
-          <button className=" rounded-lg border-2 p-2 hover:text-blue-800 hover:bg-amber-200 hover:cursor-pointer" type="submit">Submit</button>
-        </div>
+      </header>
+
+      <Form
+        method="post"
+        encType="multipart/form-data"
+        className="flex flex-col"
+      >
+        <Card className=" mx-5 md:mx-20 my-auto">
+          <CardHeader>
+            <CardTitle className=" flex flex-row gap-3">
+              <ListPlus />
+              Add New Item
+            </CardTitle>
+            <CardDescription>Insert new item on Table 1</CardDescription>
+            <CardAction></CardAction>
+          </CardHeader>
+          <CardContent className=" bg-gray-900/30 py-10 m-2">
+            <div className="mx-auto gap-6 flex flex-row">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="name">name</Label>
+                <Input type="text" name="name" id="name" />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="age">age</Label>
+                <Input type="number" name="age" id="age" />
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter>
+            <h1>Are you sure you want to Save Item?</h1>
+            <div className=" ml-auto">
+              <button
+                className=" flex flex-row gap-2 mx-auto my-3 rounded-lg border-2 p-3 bg-green-950 hover:text-blue-200 hover:font-extrabold hover:bg-amber-700 hover:cursor-pointer hover:border-4"
+                type="submit"
+              >
+                <Save />
+                Yes, Save
+              </button>
+            </div>
+          </CardFooter>
+        </Card>
       </Form>
     </>
   );

@@ -1,3 +1,27 @@
+// specific component import
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
+import { LogOut, SquareArrowRightExit } from "lucide-react";
+
+// usual component import
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "~/components/ui/breadcrumb";
+import { SidebarTrigger } from "~/components/ui/sidebar";
+
+// rrv7 import
 import type { Route } from "./+types/login";
 import { Form, type ActionFunctionArgs, redirect } from "react-router";
 import { createClientSPA } from "../lib/supabase.client.spa";
@@ -31,17 +55,49 @@ export async function clientAction({ params, request }: ActionFunctionArgs) {
 export default function Logout({ loaderData }: Route.ComponentProps) {
   return (
     <>
-      <h1>Sign Out?</h1>
-      <Form method="post" className="flex flex-col">
-        <div>
-          <button
-            className=" rounded-lg border-2 p-2 hover:text-blue-800 hover:bg-amber-200 hover:cursor-pointer"
-            type="submit"
-          >
-            Logout
-          </button>
+      <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+        <div className="flex items-center gap-2 px-4">
+          <SidebarTrigger className="-ml-1" />
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbSeparator className="hidden md:block" />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Account Logout</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
         </div>
-      </Form>
+      </header>
+
+      <Card className=" mx-5 md:mx-20 my-auto">
+        <CardHeader>
+          <CardTitle className=" flex flex-row gap-3">
+            <LogOut />
+            Logout
+          </CardTitle>
+          <CardDescription>Sign out account</CardDescription>
+          <CardAction></CardAction>
+        </CardHeader>
+        <CardContent className=" bg-gray-900/30 py-10 m-2">
+          <div className="mx-auto">
+            <h1>Are you sure you want to Sign Out?</h1>
+            <Form method="post" className="flex flex-col">
+              <div>
+                <button
+                  className=" flex flex-row gap-2 mx-auto my-3 rounded-lg border-2 p-3 bg-red-950 hover:text-blue-200 hover:font-extrabold hover:bg-amber-700 hover:cursor-pointer hover:border-4"
+                  type="submit"
+                >
+                  <SquareArrowRightExit />
+                  Yes, logout
+                </button>
+              </div>
+            </Form>
+          </div>
+        </CardContent>
+        <CardFooter>
+          <p></p>
+        </CardFooter>
+      </Card>
     </>
   );
 }

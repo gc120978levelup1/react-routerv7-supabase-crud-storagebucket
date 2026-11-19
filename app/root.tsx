@@ -1,4 +1,4 @@
-import Dashboard from "./routes/dashboard";
+import Dashboard from "./routes/dashboardFallback";
 export function HydrateFallback() {
   return <Dashboard />;
 }
