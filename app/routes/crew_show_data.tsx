@@ -90,6 +90,10 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
               <CardContent className=" bg-gray-900/30 py-10 m-2">
                 <div className="mx-auto gap-6 flex flex-row flex-wrap">
                   <div>
+                    <Label htmlFor="email">ID</Label>
+                    <p className=" font-extrabold text-2xl">{todo.id}</p>
+                  </div>
+                  <div>
                     <Label htmlFor="email">email</Label>
                     <p className=" font-extrabold text-lg">{todo.email}</p>
                   </div>
