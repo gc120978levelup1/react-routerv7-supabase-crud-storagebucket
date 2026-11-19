@@ -38,7 +38,10 @@ export async function clientLoader({ params }: Route.LoaderArgs) {
   }
 
   // main query code
-  const { data: todos } = await supabase.from("crews").select().eq("id", params.id);
+  const { data: todos } = await supabase
+    .from("crews")
+    .select()
+    .eq("id", params.id);
   return { todos };
 }
 
@@ -50,7 +53,7 @@ export default function CrewPlotOnMap({ loaderData }: Route.ComponentProps) {
     const settings = {
       longitude: loaderData.todos![0].xlon,
       latitude: loaderData.todos![0].ylat,
-    }
+    };
     // ensure that Leaflet map initialization should be done once
     if (!mapContainerRef.current || mapInstanceRef.current) return;
     mapInstanceRef.current = new LeafletMap(mapContainerRef.current).setView(
@@ -64,16 +67,13 @@ export default function CrewPlotOnMap({ loaderData }: Route.ComponentProps) {
         '&copy; <a href="https://www.google.com/maps/search/">Google Hybrid Map</a>',
     }).addTo(mapInstanceRef.current);
 
-    const { supabase } = createClientSPA();
-    supabase
-      .from("crews")
-      .select()//.eq("status","onduty")
-      .then(({ data: todos }) => {
-        //console.log("garry error todos", todos);
-        todos?.forEach((todo, index) => {
-          const marker = new Marker([todo.ylat, todo.xlon], {
-            alt: todo.callsign,
-          }).addTo(mapInstanceRef.current!).bindPopup(`
+    loaderData?.todos?.forEach((todo, index) => {
+      const marker = new Marker([todo.ylat, todo.xlon], {
+        alt: todo.callsign,
+      })
+        .addTo(mapInstanceRef.current!)
+        .bindPopup(
+          `
               <div class=" flex flex-col w-full m-0">
                 <div class=" mt-1">callsign</div>
                 <div class=" text-md font-extrabold">${todo.callsign}</div>
@@ -90,9 +90,13 @@ export default function CrewPlotOnMap({ loaderData }: Route.ComponentProps) {
                 <div class=" mt-1">description</div>
                 <div class=" text-md font-extrabold">${todo.description}</div>
               </div>
-              `);
+              `,
+        )
+        .bindTooltip(`<p class=" font-extrabold">@${todo.callsign}</p>`, {
+          permanent: true,
+          direction: "top",
         });
-      });
+    });
   }, []);
   return (
     <>

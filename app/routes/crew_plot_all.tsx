@@ -47,7 +47,9 @@ export default function CrewPlotAll({ loaderData }: Route.ComponentProps) {
   const mapInstanceRef = useRef<LeafletMap | null>(null);
   useEffect(() => {
     // retreive GPS JSON data from local storage
-    const settings = JSON.parse(localStorage.getItem("gpsSettings56867e534646")!);
+    const settings = JSON.parse(
+      localStorage.getItem("gpsSettings56867e534646")!,
+    );
     // ensure that Leaflet map initialization should be done once
     if (!mapContainerRef.current || mapInstanceRef.current) return;
     mapInstanceRef.current = new LeafletMap(mapContainerRef.current).setView(
@@ -70,7 +72,10 @@ export default function CrewPlotAll({ loaderData }: Route.ComponentProps) {
         todos?.forEach((todo, index) => {
           const marker = new Marker([todo.ylat, todo.xlon], {
             alt: todo.callsign,
-          }).addTo(mapInstanceRef.current!).bindPopup(`
+          })
+            .addTo(mapInstanceRef.current!)
+            .bindPopup(
+              `
               <div class=" flex flex-col w-full m-0">
                 <div class=" mt-1">callsign</div>
                 <div class=" text-md font-extrabold">${todo.callsign}</div>
@@ -87,7 +92,12 @@ export default function CrewPlotAll({ loaderData }: Route.ComponentProps) {
                 <div class=" mt-1">description</div>
                 <div class=" text-md font-extrabold">${todo.description}</div>
               </div>
-              `);
+              `,
+            )
+            .bindTooltip(`<p class=" font-extrabold">@${todo.callsign}</p>`, {
+              permanent: true,
+              direction: "top",
+            });
         });
       });
   }, []);

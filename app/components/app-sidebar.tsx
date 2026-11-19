@@ -246,7 +246,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   useEffect(() => {
     // check if gps is available
     if (!("geolocation" in navigator)) {
-      //setError("Geolocation is not supported by your browser.");
+      console.log("Geolocation is not supported by your browser.");
       //setLoading(false);
       return;
     }
@@ -365,10 +365,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     };
     if (!intID2.current)
       intID2.current = setInterval(() => {
-        if (mounted) {
           subscribe_to_user_data();
           subscribe_to_user_duty_status();
-        }
       }, 1000);
 
     save_user_gps_data();

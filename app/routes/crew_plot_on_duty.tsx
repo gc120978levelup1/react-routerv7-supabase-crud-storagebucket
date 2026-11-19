@@ -87,7 +87,10 @@ export default function CrewPlotOnDuty({ loaderData }: Route.ComponentProps) {
                 <div class=" mt-1">description</div>
                 <div class=" text-md font-extrabold">${todo.description}</div>
               </div>
-              `);
+              `).bindTooltip(`<p class=" font-extrabold">@${todo.callsign}</p>`, {
+              permanent: true,
+              direction: "top",
+            });
         });
       });
   }, []);

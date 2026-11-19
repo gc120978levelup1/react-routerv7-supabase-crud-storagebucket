@@ -144,10 +144,10 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
       <ul className=" flex flex-col">
         {loaderData.todos?.map((todo) => (
           <li key={todo.id}>
-            <div className="flex flex-col md:flex-row gap-2">
+            <div className="flex flex-col md:flex-row gap-2 w-full">
               <p className=" mx-auto md:ml-30 md:mr-auto w-fit">Action Menu</p>
               <div className="flex flex-col gap-2">
-                <h1 className="flex flex-col md:flex-row gap-2">
+                <h1 className="flex flex-col lg:flex-row gap-2">
                   <a
                     className=" flex flex-row gap-2 ml-2 md:ml-auto mr-3 px-3 rounded-lg border-2 bg-green-950 hover:text-blue-200 hover:font-extrabold hover:bg-amber-700 hover:cursor-pointer hover:border-4"
                     href={`/JO_add_before_picture1/${todo.id}`}
@@ -217,7 +217,7 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
               </div>
             </div>
             <br />
-            <Card className=" mx-0 w-full p-0 md:mx-20 my-auto">
+            <Card className=" mx-0 w-full md:w-[80%] md:mx-auto p-0 md:p-5 my-auto">
               <CardHeader>
                 <CardTitle className=" flex flex-row gap-3">
                   <Eye />
@@ -226,7 +226,7 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
                 <CardDescription>Show item on crews table</CardDescription>
                 <CardAction></CardAction>
               </CardHeader>
-              <CardContent className=" bg-gray-900/30 p-0 py-10 m-2">
+              <CardContent className=" bg-gray-900/30 p-0 py-4">
                 <div className="mx-auto gap-6 flex flex-row flex-wrap">
                   <div>
                     <Label htmlFor="nearAccountNumber">nearAccountNumber</Label>
@@ -347,7 +347,7 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
                 <div className="flex flex-1 flex-col gap-4 p-1 pt-0 w-full">
                   <div
                     ref={mapContainerRef}
-                    className="relative  w-full h-[60vh] md:h-[75vh] md:mx-auto mt-2 rounded-xl bg-muted/50 overflow-auto"
+                    className="relative  w-full h-[65vh] md:h-[75vh] mx-0 md:mx-auto mt-2 rounded-xl bg-muted/50 overflow-auto"
                   ></div>
                 </div>
                 <a

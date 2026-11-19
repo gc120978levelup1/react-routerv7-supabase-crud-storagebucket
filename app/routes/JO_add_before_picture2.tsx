@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { UserRoundStar, Save, ListPlus } from "lucide-react";
+import { Camera, Save, ListPlus } from "lucide-react";
 
 // usual component import
 import {
@@ -111,7 +111,7 @@ export async function clientAction({ params, request }: ActionFunctionArgs) {
     //save public url to jobs table
     const { error } = await supabase
       .from("jobs")
-      .update({ beforepicture2: data.publicUrl})
+      .update({ beforepicture2: data.publicUrl })
       .eq("id", params.id);
   }
   return { publicUrl: data.publicUrl };
@@ -129,7 +129,7 @@ export default function AvatPicture({ loaderData }: Route.ComponentProps) {
               <BreadcrumbSeparator className="hidden md:block" />
               <BreadcrumbItem>
                 <BreadcrumbPage>
-                  My Account - Change User Avatar, User Email:{" "}
+                  Job Order - Before Picture 2, User Email:{" "}
                   <span className=" p-2 bg-blue-950 font-extrabold">
                     {loaderData.user.email}
                   </span>
@@ -139,7 +139,7 @@ export default function AvatPicture({ loaderData }: Route.ComponentProps) {
           </Breadcrumb>
         </div>
       </header>
-<br />
+      <br />
       <div>
         <h1 className="flex flex-row">
           <p className=" ml-30 mr-auto w-fit">Job Order Data</p>
@@ -161,7 +161,7 @@ export default function AvatPicture({ loaderData }: Route.ComponentProps) {
         <Card className=" mx-5 md:mx-20 my-auto">
           <CardHeader>
             <CardTitle className=" flex flex-row gap-3">
-              <UserRoundStar />
+              <Camera />
               Edit Display Avatar
             </CardTitle>
             <CardDescription>
@@ -172,7 +172,7 @@ export default function AvatPicture({ loaderData }: Route.ComponentProps) {
           <CardContent className=" bg-gray-900/30 py-10 m-2">
             <div className="mx-auto gap-6 flex flex-col">
               <div className="flex flex-col gap-2">
-                <Label htmlFor="picture">User Avatar Picture</Label>
+                <Label htmlFor="picture">Upload Picture</Label>
                 <Input
                   type="file"
                   name="picture"
@@ -189,7 +189,7 @@ export default function AvatPicture({ loaderData }: Route.ComponentProps) {
             </div>
           </CardContent>
           <CardFooter>
-            <h1>Do you want to upload the changes to your Avatar Picture?</h1>
+            <h1>Do you want to upload the changes to your Before Picture 2</h1>
             <div className=" ml-auto">
               <button
                 className=" flex flex-row gap-2 mx-auto my-3 rounded-lg border-2 p-3 bg-green-950 hover:text-blue-200 hover:font-extrabold hover:bg-amber-700 hover:cursor-pointer hover:border-4"
