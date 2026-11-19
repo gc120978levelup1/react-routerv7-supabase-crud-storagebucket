@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { UserRoundStar, Save } from "lucide-react";
+import { UserRoundStar, Save, ListPlus } from "lucide-react";
 
 // usual component import
 import {
@@ -25,7 +25,7 @@ import {
 import { SidebarTrigger } from "~/components/ui/sidebar";
 
 // rrv7 import
-import type { Route } from "./+types/avat_picture";
+import type { Route } from "./+types/JO_add_after_picture2";
 import {
   Form,
   useActionData,
@@ -50,7 +50,7 @@ export async function clientLoader({ params }: Route.LoaderArgs) {
   }
 
   // main query code
-  return { user };
+  return { user, joId: params.id };
 }
 
 export async function clientAction({ params, request }: ActionFunctionArgs) {
@@ -111,7 +111,7 @@ export async function clientAction({ params, request }: ActionFunctionArgs) {
     //save public url to jobs table
     const { error } = await supabase
       .from("jobs")
-      .update({ afterpicture2: data.publicUrl})
+      .update({ afterpicture2: data.publicUrl })
       .eq("id", params.id);
   }
   return { publicUrl: data.publicUrl };
@@ -139,7 +139,20 @@ export default function AvatPicture({ loaderData }: Route.ComponentProps) {
           </Breadcrumb>
         </div>
       </header>
-
+      <br />
+      <div>
+        <h1 className="flex flex-row">
+          <p className=" ml-30 mr-auto w-fit">Job Order Data</p>
+          <a
+            className=" flex flex-row gap-2 ml-auto mr-30 px-3 rounded-lg border-2 bg-green-950 hover:text-blue-200 hover:font-extrabold hover:bg-amber-700 hover:cursor-pointer hover:border-4"
+            href={`/JO_show/${loaderData.joId}`}
+          >
+            <ListPlus />
+            Back to Main Job Order Interface
+          </a>
+        </h1>
+      </div>
+      <br />
       <Form
         method="post"
         encType="multipart/form-data"

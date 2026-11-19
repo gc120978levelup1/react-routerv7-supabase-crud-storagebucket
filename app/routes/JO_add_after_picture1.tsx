@@ -152,6 +152,7 @@ export default function AvatPicture({ loaderData }: Route.ComponentProps) {
           </a>
         </h1>
       </div>
+      <br />
       <Form
         method="post"
         encType="multipart/form-data"
