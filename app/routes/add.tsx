@@ -27,7 +27,8 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 // rrv7 import
 import type { Route } from "./+types/add";
 import { Form, type ActionFunctionArgs, redirect } from "react-router";
-import { createClientSPA } from "../lib/supabase.client.spa";
+import {supabase, headers} from "../lib/supabase-js"
+
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Table1 Add Item" },
@@ -36,7 +37,6 @@ export function meta({}: Route.MetaArgs) {
 }
 export async function clientLoader({ request }: Route.ClientLoaderArgs) {
   // middleware to guard route from unauthorized entry
-  const { supabase, headers } = createClientSPA();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -50,7 +50,6 @@ export async function clientAction({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const name = formData.get("name") as string;
   const age = formData.get("age") as string;
-  const { supabase } = createClientSPA();
   const { error } = await supabase.from("table1").insert({ name, age });
   return redirect(`/`);
 }

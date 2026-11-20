@@ -27,7 +27,8 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 // rrv7 import
 import { Form, type ActionFunctionArgs, redirect } from "react-router";
 import type { Route } from "./+types/delete";
-import { createClientSPA } from "../lib/supabase.client.spa";
+import {supabase, headers} from "../lib/supabase-js"
+
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Table1 Delete Item" },
@@ -36,7 +37,6 @@ export function meta({}: Route.MetaArgs) {
 }
 export async function clientLoader({ params }: Route.LoaderArgs) {
   // middleware to guard route from unauthorized entry
-  const { supabase, headers } = createClientSPA();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -53,7 +53,6 @@ export async function clientLoader({ params }: Route.LoaderArgs) {
 }
 
 export async function clientAction({ params }: ActionFunctionArgs) {
-  const { supabase } = createClientSPA();
   const { error } = await supabase.from("table1").delete().eq("id", params.id);
   return redirect(`/`);
 }

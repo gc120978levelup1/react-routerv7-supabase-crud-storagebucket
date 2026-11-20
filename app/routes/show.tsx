@@ -1,7 +1,6 @@
 // this specific page component import
 // specific component import
 import { Label } from "~/components/ui/label";
-import { Input } from "~/components/ui/input";
 import {
   Card,
   CardAction,
@@ -17,7 +16,6 @@ import { Eye, PencilLine, ListX } from "lucide-react";
 import {
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
@@ -26,7 +24,8 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 
 // rrv7 import
 import type { Route } from "./+types/show";
-import { createClientSPA } from "../lib/supabase.client.spa";
+//import { createClientSPA } from "../lib/supabase.client.spa";
+import { supabase, headers } from "../lib/supabase-js";
 import { redirect } from "react-router";
 export function meta({}: Route.MetaArgs) {
   return [
@@ -36,7 +35,7 @@ export function meta({}: Route.MetaArgs) {
 }
 export async function clientLoader({ params }: Route.LoaderArgs) {
   // middleware to guard route from unauthorized entry
-  const { supabase, headers } = createClientSPA();
+  //const { supabase, headers } = createClientSPA();
   const {
     data: { user },
   } = await supabase.auth.getUser();
