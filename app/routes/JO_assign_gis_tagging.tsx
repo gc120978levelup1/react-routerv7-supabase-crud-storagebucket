@@ -141,6 +141,7 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
       refLat.current!.value = lat.toString();
       refLon.current!.value = lng.toString();
     });
+    
   }, []);
   return (
     <>
