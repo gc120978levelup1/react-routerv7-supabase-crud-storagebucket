@@ -141,36 +141,6 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
       refLat.current!.value = lat.toString();
       refLon.current!.value = lng.toString();
     });
-
-    const { supabase } = createClientSPA();
-    supabase
-      .from("crews")
-      .select()
-      .then(({ data: todos }) => {
-        console.log("garry error todos", todos);
-        todos?.forEach((todo, index) => {
-          const marker = new Marker([todo.ylat, todo.xlon], {
-            alt: todo.callsign,
-          }).addTo(mapInstanceRef.current!).bindPopup(`
-              <div class=" flex flex-col w-full m-0">
-                <div class=" mt-1">callsign</div>
-                <div class=" text-md font-extrabold">${todo.callsign}</div>
-                <div class=" mt-1">email</div>
-                <div class=" text-md font-extrabold">${todo.email}</div>
-                <div class=" mt-1">displayname</div>
-                <div class=" text-md font-extrabold">${todo.displayname}</div>
-                <div class=" mt-1">mobilenumber</div>
-                <div class=" text-md font-extrabold">${todo.mobilenumber}</div>
-                <div class=" mt-1">crewType</div>
-                <div class=" text-md font-extrabold">${todo.crewType}</div>
-                <div class=" mt-1">status</div>
-                <div class=" text-md font-extrabold">${todo.status}</div>
-                <div class=" mt-1">description</div>
-                <div class=" text-md font-extrabold">${todo.description}</div>
-              </div>
-              `);
-        });
-      });
   }, []);
   return (
     <>
@@ -288,6 +258,7 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
                       className=" object-cover w-full"
                       alt="beforepicture2"
                     />
+                    
                   </div>
                   <Button
                     className="w-full md:w-fit ml-auto"
