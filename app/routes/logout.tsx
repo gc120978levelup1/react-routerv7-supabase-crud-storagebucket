@@ -24,7 +24,8 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 // rrv7 import
 import type { Route } from "./+types/login";
 import { Form, type ActionFunctionArgs, redirect } from "react-router";
-import { createClientSPA } from "../lib/supabase.client.spa";
+//import { createClientSPA } from "../lib/supabase.client.spa";
+import {supabase, headers} from "../lib/supabase-js";
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Logout Page" },
@@ -33,7 +34,7 @@ export function meta({}: Route.MetaArgs) {
 }
 export async function clientLoader({ params }: Route.LoaderArgs) {
   // middleware to guard route from unauthorized entry
-  const { supabase, headers } = createClientSPA();
+  //const { supabase, headers } = createClientSPA();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -45,7 +46,7 @@ export async function clientLoader({ params }: Route.LoaderArgs) {
 }
 
 export async function clientAction({ params, request }: ActionFunctionArgs) {
-  const { supabase } = createClientSPA();
+  //const { supabase } = createClientSPA();
   const { error } = await supabase.auth.signOut();
   //console.log("garry error ", error);
 
@@ -81,7 +82,7 @@ export default function Logout({ loaderData }: Route.ComponentProps) {
         <CardContent className=" bg-gray-900/30 py-10 m-2">
           <div className="mx-auto">
             <h1>Are you sure you want to Sign Out?</h1>
-            <Form method="post" className="flex flex-col">
+            <Form method="post" encType="multipart/form-data" className="flex flex-col">
               <div>
                 <button
                   className=" flex flex-row gap-2 mx-auto my-3 rounded-lg border-2 p-3 bg-red-950 hover:text-blue-200 hover:font-extrabold hover:bg-amber-700 hover:cursor-pointer hover:border-4"

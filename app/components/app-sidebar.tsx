@@ -341,6 +341,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           });
       }
     };
+    
     if (!intID1.current)
       intID1.current = setInterval(() => {
         save_user_gps_data();

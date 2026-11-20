@@ -11,8 +11,10 @@ import {
 import { Input } from "~/components/ui/input";
 
 import type { Route } from "./+types/login";
-import { Form, type ActionFunctionArgs, redirect } from "react-router";
-import { createClientSPA } from "../lib/supabase.client.spa";
+import { Form, type ActionFunctionArgs, redirect, NavLink } from "react-router";
+//import { createClientSPA } from "../lib/supabase.client.spa";
+import {supabase, headers} from "../lib/supabase-js";
+
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Login Page" },
@@ -22,7 +24,7 @@ export function meta({}: Route.MetaArgs) {
 export async function clientLoader({ params }: Route.LoaderArgs) {
   //on_load_page
   // middleware to guard route from unauthorized entry
-  const { supabase, headers } = createClientSPA();
+  //const { supabase, headers } = createClientSPA();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -37,7 +39,7 @@ export async function clientAction({ params, request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
-  const { supabase } = createClientSPA();
+  //const { supabase } = createClientSPA();
   const { error } = await supabase.auth.signInWithPassword({
     email: email,
     password: password,

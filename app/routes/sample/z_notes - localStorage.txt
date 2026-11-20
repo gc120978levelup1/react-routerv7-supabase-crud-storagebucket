@@ -1,0 +1,86 @@
+import { subscribe } from "../utils/storage";
+
+/utils/storage.ts
+// declare each store key here
+const store_key_user_id = "store_key_user_id90485-093iorgknfmuwei";
+const store_key_avatar  = "store_key_avatar9iewogkgplke[msgperrgp";
+
+// used for subscribing
+const get_store_value = (key) => { 
+    return JSON.parse(localStorage.getItem(key))
+}
+
+const set_store_value = (key, value) => {
+    localStorage.setItem(key, JSON.stringify(value, null, 2))
+}
+
+const store_subscribe_fast = (callbackFunction) => {
+    return setInterval(()=>{
+        callbackFunction();
+    },1000);
+}
+
+const store_subscribe_slow = (callbackFunction) => {
+    return setInterval(()=>{
+        callbackFunction();
+    },60000);
+}
+
+const store_broadcast_fast = (callbackFunction) => {
+    return setInterval(()=>{
+        callbackFunction();
+    },1000);
+}
+
+const store_broadcast_slow = (callbackFunction) => {
+    return setInterval(()=>{
+        callbackFunction();
+    },60000);
+}
+
+const store_clean_up = (store_subscription_id) => {
+    clearInterval(store_subscription_id);
+    store_subscription_id.current = null;
+}
+
+const store_clean_up_key = (store_key) => {
+    localStorage.removeItem(store_key)
+}
+
+export {
+    store_key_user_id,
+    store_key_avatar,
+    get_store_value,
+    set_store_value,
+    store_subscribe_fast,
+    store_subscribe_slow,
+    store_clean_up,
+}
+
+// usual code
+# broadcasting
+
+const useRef_broadcast_id = useRef(null)
+
+// inside use effect
+useRef_broadcast_id.current = store_broadcast_slow(()=>{
+    // get data from database or gps
+    set_store_value(store_key_user_id, { user_id : user_id})
+})
+
+@useEffect return,
+store_clean_up(useRef_broadcast_id)
+store_clean_up_key(store_key_user_id)
+
+# ----------------------------------------------------------------
+# subscribe
+const useRef_subscribe_id = useRef(null)
+const [userID, setUserID] = useState(null)
+// inside use effect
+useRef_subscribe_id.current = store_subscribe_fast(()=>{
+    // get data from database or gps
+    setUserID (get_store_value(store_key_user_id));
+})
+
+@useEffect return,
+store_clean_up(useRef_subscribe_id)
