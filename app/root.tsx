@@ -12,6 +12,7 @@ import {
   ScrollRestoration,
 } from "react-router";
 
+import { ThemeProvider } from "~/components/theme-provider";
 import type { Route } from "./+types/root";
 import "./app.css";
 
@@ -30,7 +31,7 @@ export const links: Route.LinksFunction = () => [
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <meta
           httpEquiv="Cache-Control"
@@ -44,7 +45,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
         <ScrollRestoration />
         <Scripts />
       </body>

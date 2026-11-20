@@ -1,4 +1,4 @@
-import { AppSidebar } from "~/components/app-sidebarFallback"
+import { AppSidebar } from "../components/app-sidebarFallback"
 import {
   Outlet,
 } from "react-router";

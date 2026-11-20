@@ -77,7 +77,7 @@ export default function Login({ loaderData }: Route.ComponentProps) {
         <div className={cn("flex flex-col gap-6", "")}>
           <Card className="overflow-hidden p-0">
             <CardContent className="grid p-0 md:grid-cols-2">
-              <Form method="post" className="p-6 md:p-8">
+              <Form method="post" encType="multipart/form-data" className="p-6 md:p-8">
                 <FieldGroup>
                   <div className="flex flex-col items-center gap-2 text-center">
                     <h1 className="text-2xl font-bold">Welcome back</h1>

@@ -293,44 +293,44 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
                     </p>
                   </div>
 
-                  <div className="flex flex-col md:flex-row flex-wrap gap-2">
-                    <div>
+                  <div className="w-full flex flex-col md:flex-row flex-wrap gap-2">
+                    <div className="w-full md:w-[23%]">
                       <Label className="mb-2" htmlFor="beforepicture1">
                         beforepicture1
                       </Label>
                       <img
+                         className=" h-100 object-cover "
                         src={todo.beforepicture1}
-                        width={180}
                         alt="beforepicture1"
                       />
                     </div>
-                    <div>
+                    <div className="w-full md:w-[23%]">
                       <Label className="mb-2" htmlFor="beforepicture2">
                         beforepicture2
                       </Label>
                       <img
                         src={todo.beforepicture2}
-                        width={180}
+                         className=" h-100 object-cover "
                         alt="beforepicture2"
                       />
                     </div>
-                    <div>
+                    <div className="w-full md:w-[23%]">
                       <Label className="mb-2" htmlFor="afterpicture1">
                         afterpicture1
                       </Label>
                       <img
                         src={todo.afterpicture1}
-                        width={180}
+                         className=" h-100 object-cover "
                         alt="afterpicture1"
                       />
                     </div>
-                    <div>
+                    <div className="w-full md:w-[23%]">
                       <Label className="mb-2" htmlFor="afterpicture2">
                         afterpicture2
                       </Label>
                       <img
                         src={todo.afterpicture2}
-                        width={180}
+                        className=" h-100 object-cover "
                         alt="afterpicture2"
                       />
                     </div>
@@ -342,8 +342,8 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
                 </div>
                 <br />
                 <Label className="mb-2" htmlFor="afterpicture2">
-                        Location Map of the Job Order
-                      </Label>
+                  Location Map of the Job Order
+                </Label>
                 <div className="flex flex-1 flex-col gap-4 p-1 pt-0 w-full">
                   <div
                     ref={mapContainerRef}
