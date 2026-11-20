@@ -171,11 +171,10 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
               `);
         });
       });
-    scrollhereRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
   return (
     <>
-      <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+      <header className="hidden md:flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
         <div className="flex items-center gap-2 px-4">
           <SidebarTrigger className="-ml-1" />
           <Breadcrumb>
@@ -190,10 +189,10 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
       </header>
       <ul className=" flex flex-col">
         <div>
-          <h1 className="flex flex-row">
-            <p className=" ml-0 md:ml-30 mr-auto w-fit">Job Order Data</p>
+          <h1 className="hidden md:flex md:flex-row  w-full">
+            <p className=" ml-3 md:ml-30 mr-auto w-fit">Job Order Data</p>
             <a
-              className=" flex flex-row gap-2 ml-auto mr-30 px-3 rounded-lg border-2 bg-green-950 hover:text-blue-200 hover:font-extrabold hover:bg-amber-700 hover:cursor-pointer hover:border-4"
+              className=" flex flex-row gap-2 ml-auto mr-4 md:mr-30 px-3 rounded-lg border-2 bg-green-950 hover:text-blue-200 hover:font-extrabold hover:bg-amber-700 hover:cursor-pointer hover:border-4"
               href={`/JO_show/${loaderData.joId}`}
             >
               <ListPlus />
@@ -208,13 +207,21 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
               <CardHeader>
                 <CardTitle className=" flex flex-row gap-3">
                   <Eye />
-                  Show Item
+                  Complain Ticket
                 </CardTitle>
-                <CardDescription>Show item on crews table</CardDescription>
+                <CardDescription>
+                  Save the link for this Complain ticket.
+                </CardDescription>
                 <CardAction></CardAction>
               </CardHeader>
-              <CardContent className=" bg-gray-900/30 py-10 m-2">
+              <CardContent className=" bg-gray-900/30 m-2">
                 <div className="mx-auto gap-6 flex flex-row flex-wrap">
+                  <div>
+                    <Label htmlFor="nearAccountNumber">Complain Tiket #</Label>
+                    <p className=" font-extrabold text-2xl text-center text-blue-300 bg-amber-800 rounded-full border-4 mt-2">
+                      {todo.id}
+                    </p>
+                  </div>
                   <div>
                     <Label htmlFor="nearAccountNumber">nearAccountNumber</Label>
                     <p className=" font-extrabold text-lg">
@@ -226,28 +233,30 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
                     <p className=" font-extrabold text-lg">{todo.dateNew}</p>
                   </div>
                   <div>
-                    <Label htmlFor="status">status</Label>
-                    <p className=" font-extrabold text-lg">{todo.status}</p>
-                  </div>
-                  <div>
-                    <Label htmlFor="crewId">crewId</Label>
-                    <p className=" font-extrabold text-lg">{todo.crewId}</p>
-                  </div>
-                  <div>
                     <Label htmlFor="dateAssigned">dateAssigned</Label>
                     <p className=" font-extrabold text-lg">
                       {todo.dateAssigned}
                     </p>
                   </div>
                   <div>
+                    <Label htmlFor="status">status</Label>
+                    <p className=" font-extrabold text-lg">{todo.status}</p>
+                  </div>
+                  <div>
+                    <Label htmlFor="crewId">crewId</Label>
+                    <p className=" text-center font-extrabold text-lg">
+                      {todo.crewId}
+                    </p>
+                  </div>
+                  <div className="w-full">
                     <Label htmlFor="description">description</Label>
                     <p className=" font-extrabold text-lg">
                       {todo.description}
                     </p>
                   </div>
-                  <div>
+                  <div className="md:w-[25%]">
                     <a
-                      className=" flex flex-row gap-2 ml-2 md:ml-auto mr-3 px-3 rounded-lg border-2 bg-green-950 hover:text-blue-200 hover:font-extrabold hover:bg-amber-700 hover:cursor-pointer hover:border-4"
+                      className="hidden md:flex md:flex-row  gap-2 ml-2 mr-3 px-3 rounded-lg border-2 bg-green-950 hover:text-blue-200 hover:font-extrabold hover:bg-amber-700 hover:cursor-pointer hover:border-4"
                       href={`/JO_add_before_picture1/${todo.id}`}
                     >
                       <ListPlus />
@@ -258,14 +267,14 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
                       beforepicture2
                     </Label>
                     <img
+                      className=" object-cover w-full"
                       src={todo.beforepicture1}
-                      width={180}
                       alt="beforepicture1"
                     />
                   </div>
-                  <div>
+                  <div className="md:w-[25%]">
                     <a
-                      className=" flex flex-row gap-2 ml-2 md:ml-auto mr-3 px-3 rounded-lg border-2 bg-green-950 hover:text-blue-200 hover:font-extrabold hover:bg-amber-700 hover:cursor-pointer hover:border-4"
+                      className="hidden md:flex md:flex-row  gap-2 ml-2 mr-3 px-3 rounded-lg border-2 bg-green-950 hover:text-blue-200 hover:font-extrabold hover:bg-amber-700 hover:cursor-pointer hover:border-4"
                       href={`/JO_add_before_picture2/${todo.id}`}
                     >
                       <ListPlus />
@@ -276,14 +285,20 @@ export default function PersonnelData({ loaderData }: Route.ComponentProps) {
                     </Label>
                     <img
                       src={todo.beforepicture2}
-                      width={180}
+                      className=" object-cover w-full"
                       alt="beforepicture2"
                     />
                   </div>
-                  <p>
-                    {" "}
-                    <a href=""></a>
-                  </p>
+                  <Button
+                    className="w-full md:w-fit ml-auto"
+                    onClick={() => {
+                      scrollhereRef.current?.scrollIntoView({
+                        behavior: "smooth",
+                      });
+                    }}
+                  >
+                    Scroll Down Map
+                  </Button>
                 </div>
               </CardContent>
             </Card>
