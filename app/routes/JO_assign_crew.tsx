@@ -48,6 +48,10 @@ import { useEffect, useRef, useState } from "react";
 import type { Route } from "./+types/JO_assign_crew";
 import { createClientSPA } from "../lib/supabase.client.spa";
 import { redirect } from "react-router";
+import { authGuard } from "~/auth/Login";
+import type { supabase } from "~/lib/supabase-js";
+import { job_index_i } from "~/models/Jobs";
+import { crew_index_on_duty } from "~/models/Crews";
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Personnel Data" },
@@ -56,21 +60,13 @@ export function meta({}: Route.MetaArgs) {
 }
 export async function clientLoader({ params }: Route.LoaderArgs) {
   // middleware to guard route from unauthorized entry
-  const { supabase, headers } = createClientSPA();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return redirect("/login");
-  }
+  // authenticity guard
+  const UserIsNotAuthenticated = !(await authGuard());
+  if (UserIsNotAuthenticated) return redirect("/login");
 
   // main query code
-  const {
-    data: todos,
-    //count,
-    error,
-  } = await supabase.from("jobs").select("*").eq("id", params.id);
-  const { data: todos2 } = await supabase.from("crews").select();
+  const todos = await job_index_i(params.id);
+  const todos2 = await crew_index_on_duty();
   const joId = todos![0].id;
   return { todos, todos2, joId};
 }

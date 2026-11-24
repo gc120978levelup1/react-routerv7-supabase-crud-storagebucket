@@ -28,6 +28,7 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 import type { Route } from "./+types/password";
 import { Form, type ActionFunctionArgs, redirect } from "react-router";
 import { createClientSPA } from "../lib/supabase.client.spa";
+import { userAuthGet, userUpdatePassword } from "~/auth/Login";
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Change Password" },
@@ -36,14 +37,8 @@ export function meta({}: Route.MetaArgs) {
 }
 export async function clientLoader({ params }: Route.LoaderArgs) {
   // middleware to guard route from unauthorized entry
-  const { supabase, headers } = createClientSPA();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return redirect("/login");
-  }
-
+  const user = await userAuthGet();
+  if (!user) return redirect("/login");
   // main query code
   return { user };
 }
@@ -55,20 +50,14 @@ export async function clientAction({ params, request }: ActionFunctionArgs) {
   const retype_password = formData.get("retype_password") as string;
   const { supabase } = createClientSPA();
   let userId = "";
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const  user = await userAuthGet();
   if (user) {
     userId = user.email as string;
   }
   //console.log("password1", password);
   //console.log("password2", retype_password);
   if (password == retype_password) {
-    const { error } = await supabase.auth.updateUser({
-      email: userId,
-      current_password: current_password,
-      password: password,
-    });
+    const error  = await userUpdatePassword(userId, current_password, password);
     if (!error) return redirect(`/`);
   } else {
     console.log("password do not match");

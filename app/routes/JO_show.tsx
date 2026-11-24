@@ -31,8 +31,9 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 
 // rrv7 import
 import type { Route } from "./+types/JO_show";
-import { createClientSPA } from "../lib/supabase.client.spa";
 import { redirect } from "react-router";
+import { authGuard } from "~/auth/Login";
+import { job_index_i } from "~/models/Jobs";
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Personnel Data" },
@@ -41,21 +42,13 @@ export function meta({}: Route.MetaArgs) {
 }
 export async function clientLoader({ params }: Route.LoaderArgs) {
   // middleware to guard route from unauthorized entry
-  const { supabase, headers } = createClientSPA();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return redirect("/login");
-  }
+  // authenticity guard
+  const UserIsNotAuthenticated = !(await authGuard());
+  if (UserIsNotAuthenticated) return redirect("/login");
 
   // main query code
-  const {
-    data: todos,
-    count,
-    error,
-  } = await supabase.from("jobs").select("*").eq("id", params.id);
-  return { todos, count };
+  const todos = await job_index_i(params.id);
+  return { todos, count:1 };
 }
 
 export default function PersonnelData({ loaderData }: Route.ComponentProps) {

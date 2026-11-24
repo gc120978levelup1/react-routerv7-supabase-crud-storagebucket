@@ -37,6 +37,11 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 import type { Route } from "./+types/personnel_data_update";
 import { createClientSPA } from "../lib/supabase.client.spa";
 import { Form, type ActionFunctionArgs, redirect } from "react-router";
+import { authGuard, userAuthGet } from "~/auth/Login";
+import { supabase } from "~/lib/supabase-js";
+import { crew_index_email, crew_upsert } from "~/models/Crews";
+import type { error } from "console";
+import { set_store_value, userDutyStatus } from "~/lib/globalVar";
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Personnel Duty Status Update" },
@@ -45,54 +50,30 @@ export function meta({}: Route.MetaArgs) {
 }
 export async function clientLoader({ params }: Route.LoaderArgs) {
   // middleware to guard route from unauthorized entry
-  const { supabase, headers } = createClientSPA();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return redirect("/login");
-  }
+  // authenticity guard
+  const user = await userAuthGet();
+  if (!user) return redirect("/login");
 
   // main query code
-  const {
-    data: todos,
-    count,
-    error,
-  } = await supabase
-    .from("crews")
-    .select("*", { count: "exact" })
-    .eq("email", user.email);
-  //console.log("garry error count", count);
-  //console.log("garry error error", error);
+  const todos = await crew_index_email(user.email);
+  const count = todos ? 1 : 0;
   return { todos, count, user };
 }
 
 export async function clientAction({ params, request }: ActionFunctionArgs) {
   const formData = await request.formData();
-  const email = formData.get("email") as string;
-  const status = formData.get("status") as string;
-  const { supabase } = createClientSPA();
-  const { data, error } = await supabase
-    .from("crews")
-    .upsert(
-      {
-        email: email,
-        status: status,
-      },
-      { onConflict: "email" },
-    )
-    .select();
+  const allData = Object.fromEntries(formData);
+  const todos = await crew_upsert(allData);
 
   // save changes in user duty status to local storage
-  if (!error) {
-    const settings = {
-      email: email,
-      status: status,
-    };
-    localStorage.setItem("userDutyStatus1234567890", JSON.stringify(settings));
+  if (todos) {
+    set_store_value(userDutyStatus,{
+      email: todos[0].email,
+      status: todos[0].status,
+    });
   }
 
-  if (!error) return redirect(`/`);
+  if (todos) return redirect(`/personnel_duty_status_update`);
 }
 
 export default function PersonnelDataUpdate({

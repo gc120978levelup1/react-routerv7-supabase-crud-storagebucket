@@ -32,8 +32,10 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 
 // rrv7 import
 import type { Route } from "./+types/_index";
-import { createClientSPA } from "../lib/supabase.client.spa";
+
 import { redirect } from "react-router";
+import { authGuard } from "~/auth/Login";
+import { job_index } from "~/models/Jobs";
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Table1 Master List" },
@@ -41,18 +43,13 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 export async function clientLoader({ request }: Route.ClientLoaderArgs) {
-  //on_load_page
   // middleware to guard route from unauthorized entry
-  const { supabase, headers } = createClientSPA();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return redirect("/login");
-  }
+  // authenticity guard
+  const UserIsNotAuthenticated = !(await authGuard());
+  if (UserIsNotAuthenticated) return redirect("/login");
 
   // main query code
-  const { data: todos } = await supabase.from("jobs").select();
+  const todos = await job_index();
   return { todos };
 }
 

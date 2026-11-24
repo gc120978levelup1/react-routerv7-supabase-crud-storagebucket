@@ -32,23 +32,25 @@ import {
   type ActionFunctionArgs,
   redirect,
 } from "react-router";
-import { createClientSPA } from "../lib/supabase.client.spa";
+
+import { storageUploadImage } from "~/models/StorageImages";
+import { authGuard, userAuthGet } from "~/auth/Login";
+import { set_store_value, user_settings } from "~/lib/globalVar";
+
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "User Avatar" },
     { name: "description", content: "Page for User to Upload Avatar picture" },
   ];
 }
+
 export async function clientLoader({ params }: Route.LoaderArgs) {
   // middleware to guard route from unauthorized entry
-  const { supabase, headers } = createClientSPA();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return redirect("/login");
-  }
+  // authenticity guard
+  const UserIsNotAuthenticated = !(await authGuard());
+  if (UserIsNotAuthenticated) return redirect("/login");
 
+  const user = await userAuthGet()
   // main query code
   return { user };
 }
@@ -57,67 +59,18 @@ export async function clientAction({ params, request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const file = formData.get("picture");
   if (!(file instanceof File) || file.size === 0) {
-    console.log("garry error file", file);
-    console.log("garry error", "Please select a valid image file.");
     return { error: "Please select a valid image file." };
   }
-  // Get the authenticated user so uploads go into that user's folder.
-  const { supabase } = createClientSPA();
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-  if (userError) throw userError;
-  if (!user) throw new Error("Sign in before uploading.");
-
-  const extension = file.name.includes(".")
-    ? file.name.split(".").pop()?.toLowerCase()
-    : "bin";
-  //const path = `${user.id}/${crypto.randomUUID()}.${extension}`;
-  const path = `${user.id}/avatar`;
-  console.log("garry error path", path);
-
-  // 1. Upload the file to Supabase Storage
-  const { error: uploadError } = await supabase.storage
-    .from("images") // Replace with your bucket name
-    .upload(path, file, {
-      cacheControl: "0",
-      upsert: true,
-      contentType: file.type, // Explicitly set content type
-    });
-
-  console.log("garry error", uploadError);
-
-    // 2. Retrieve the public URL (for public buckets)
-    const { data } = supabase.storage.from("images").getPublicUrl(path);
-
-    console.log("garry error data", data);
-    // save changes in user settings to local storage
-    if (true) {
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
-      if (userError) {
-        console.error(userError.message);
-        return;
-      }
-      if (!user) {
-        return;
-      }
-      const path = `${user.id}/avatar`;
-      const { data } = supabase.storage.from("images").getPublicUrl(path);
-
-      const settings = {
-        name: user.user_metadata?.display_name,
-        email: user.email,
-        avatar: data.publicUrl,
-      };
-
-      localStorage.setItem("userSettings1234567890", JSON.stringify(settings));
-    }
-    return { publicUrl: data.publicUrl };
-
+  const user = await userAuthGet();
+  const path = `${user?.id}/avatar`;
+  const data = await storageUploadImage(file, path);
+  set_store_value(user_settings, {
+    name: user?.user_metadata?.display_name,
+    email: user?.email,
+    avatar: data?.publicUrl,
+  });
+  window.location.reload();
+  return { publicUrl: data?.publicUrl };
 }
 
 export default function AvatPicture({ loaderData }: Route.ComponentProps) {

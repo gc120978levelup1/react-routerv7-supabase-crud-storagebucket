@@ -28,7 +28,10 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 // rrv7 import
 import type { Route } from "./+types/JO_new";
 import { Form, type ActionFunctionArgs, redirect } from "react-router";
-import { createClientSPA } from "../lib/supabase.client.spa";
+//import { createClientSPA } from "../lib/supabase.client.spa";
+import { authGuard } from "~/auth/Login";
+//import { error } from "console";
+import { job_create } from "~/models/Jobs";
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Table1 Add Item" },
@@ -37,31 +40,23 @@ export function meta({}: Route.MetaArgs) {
 }
 export async function clientLoader({ request }: Route.ClientLoaderArgs) {
   // middleware to guard route from unauthorized entry
-  const { supabase, headers } = createClientSPA();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return redirect("/login");
-  }
+  // authenticity guard
+  const UserIsNotAuthenticated = !(await authGuard());
+  if (UserIsNotAuthenticated) return redirect("/login");
 
   // main query code
 }
+
 export async function clientAction({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
-  const nearAccountNumber = formData.get("nearAccountNumber") as string;
-  const description = formData.get("description") as string;
-  const status = "new";
-  const dateNew = new Date();
-  //const dateNew = now.toString();
-  const { supabase } = createClientSPA();
-  const { error, data: todos } = await supabase
-    .from("jobs")
-    .insert({ nearAccountNumber, description, status, dateNew })
-    .select("id")
-    .single();
-  if (!error) {
-    return redirect(`/JO_show/${todos.id}`);
+  const todos = await job_create({
+    nearAccountNumber: formData.get("nearAccountNumber") as string,
+    description: formData.get("description") as string,
+    status: "new",
+    dateNew: new Date(),
+  });
+  if (todos) {
+    return redirect(`/JO_show/${todos[0].id}`);
   }
 }
 

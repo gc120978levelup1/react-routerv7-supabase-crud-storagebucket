@@ -35,8 +35,9 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 
 // rrv7 import
 import type { Route } from "./+types/JO_assign_gis_tagging";
-import { createClientSPA } from "../lib/supabase.client.spa";
 import { Form, redirect, type ActionFunctionArgs } from "react-router";
+import { job_edit, job_index_i } from "~/models/Jobs";
+import { createClientSPA } from "~/lib/supabase.client.spa";
 //import type { Input } from "@base-ui/react";
 export function meta({}: Route.MetaArgs) {
   return [
@@ -46,35 +47,18 @@ export function meta({}: Route.MetaArgs) {
 }
 export async function clientLoader({ params }: Route.LoaderArgs) {
   // middleware to guard route from unauthorized entry
-  const { supabase, headers } = createClientSPA();
   // donot need login
-  /*
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return redirect("/login");
-  }
-  */
+  
   // main query code
-  const {
-    data: todos,
-    //count,
-    error,
-  } = await supabase.from("jobs").select("*").eq("id", params.id);
+  const todos= await job_index_i(params.id);
   const joId = todos![0].id;
   return { todos, joId };
 }
 
 export async function clientAction({ params, request }: ActionFunctionArgs) {
   const formData = await request.formData();
-  const xlon = formData.get("xlon") as string;
-  const ylat = formData.get("ylat") as string;
-  const { supabase } = createClientSPA();
-  const { error } = await supabase
-    .from("jobs")
-    .update({ xlon, ylat })
-    .eq("id", params.id);
+  const allData = Object.fromEntries(formData);
+  const todos = await job_edit(params.id, allData);
   return redirect(`/JO_show/${params.id}`);
 }
 

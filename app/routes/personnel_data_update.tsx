@@ -35,8 +35,9 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 
 // rrv7 import
 import type { Route } from "./+types/personnel_data_update";
-import { createClientSPA } from "../lib/supabase.client.spa";
 import { Form, type ActionFunctionArgs, redirect } from "react-router";
+import { userAuthGet } from "~/auth/Login";
+import { crew_index_email, crew_upsert } from "~/models/Crews";
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Personnel Data Update" },
@@ -45,52 +46,21 @@ export function meta({}: Route.MetaArgs) {
 }
 export async function clientLoader({ params }: Route.LoaderArgs) {
   // middleware to guard route from unauthorized entry
-  const { supabase, headers } = createClientSPA();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return redirect("/login");
-  }
+  // authenticity guard
+  const user =  await userAuthGet();
+  if (!user) return redirect("/login");
 
   // main query code
-  const {
-    data: todos,
-    count,
-    error,
-  } = await supabase
-    .from("crews")
-    .select("*", { count: "exact" })
-    .eq("email", user.email);
-  console.log("garry error count", count);
+  const todos = await crew_index_email(user.email);
+  const count = (todos ? 1 : 0);
   return { todos, count, user };
 }
 
 export async function clientAction({ params, request }: ActionFunctionArgs) {
   const formData = await request.formData();
-  const email = formData.get("email") as string;
-  const displayname = formData.get("displayname") as string;
-  const callsign = formData.get("callsign") as string;
-  const mobilenumber = formData.get("mobilenumber") as string;
-  const description = formData.get("description") as string;
-  const crewType = formData.get("crewType") as string;
-  const { supabase } = createClientSPA();
-  const { data, error } = await supabase
-    .from("crews")
-    .upsert(
-      {
-        email: email,
-        displayname: displayname,
-        callsign: callsign,
-        mobilenumber: mobilenumber,
-        description: description,
-        crewType: crewType,
-      },
-      { onConflict: "email" },
-    )
-    .select();
-
-  if (!error) return redirect(`/`);
+  const allData = Object.fromEntries(formData);
+  const todos = await crew_upsert(allData);
+  if (todos) return redirect(`/personnel_data`);
 }
 
 export default function PersonnelDataUpdate({
@@ -148,7 +118,6 @@ export default function PersonnelDataUpdate({
                       name="displayname"
                       id="displayname"
                       defaultValue={loaderData.user.user_metadata?.display_name}
-                      readOnly
                     />
                   </div>
 
@@ -254,7 +223,6 @@ export default function PersonnelDataUpdate({
                           name="displayname"
                           id="displayname"
                           defaultValue={todo.displayname}
-                          readOnly
                         />
                       </div>
 

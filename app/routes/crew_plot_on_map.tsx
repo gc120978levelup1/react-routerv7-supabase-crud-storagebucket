@@ -18,8 +18,9 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 
 // rrv7 import
 import type { Route } from "./+types/crew_plot_on_map";
-import { createClientSPA } from "../lib/supabase.client.spa";
 import { redirect } from "react-router";
+import { authGuard } from "~/auth/Login";
+import { crew_index_i } from "~/models/Crews";
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "crews Master List Plot" },
@@ -27,21 +28,13 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 export async function clientLoader({ params }: Route.LoaderArgs) {
-  //on_load_page
   // middleware to guard route from unauthorized entry
-  const { supabase, headers } = createClientSPA();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return redirect("/login");
-  }
+  // authenticity guard
+  const UserIsNotAuthenticated = !(await authGuard());
+  if (UserIsNotAuthenticated) return redirect("/login");
 
   // main query code
-  const { data: todos } = await supabase
-    .from("crews")
-    .select()
-    .eq("id", params.id);
+  const todos = await crew_index_i(params.id)
   return { todos };
 }
 

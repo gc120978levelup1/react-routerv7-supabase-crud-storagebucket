@@ -28,6 +28,8 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 import type { Route } from "./+types/edit";
 import { Form, type ActionFunctionArgs, redirect } from "react-router";
 import {supabase, headers} from "../lib/supabase-js"
+import { authGuard } from "~/auth/Login";
+import { table1_edit, table1_index_i } from "~/models/Table1";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -37,29 +39,28 @@ export function meta({}: Route.MetaArgs) {
 }
 export async function clientLoader({ params }: Route.LoaderArgs) {
   // middleware to guard route from unauthorized entry
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return redirect("/login");
-  }
+  // authenticity guard
+  const UserIsNotAuthenticated = !(await authGuard());
+  if (UserIsNotAuthenticated) return redirect("/login");
 
   // main query code
+  const todos = await table1_index_i(params.id)
+  /*
   const { data: todos } = await supabase
     .from("table1")
     .select("*")
     .eq("id", params.id);
+    */
   return { todos };
 }
 
 export async function clientAction({ params, request }: ActionFunctionArgs) {
   const formData = await request.formData();
-  const name = formData.get("name") as string;
-  const age = formData.get("age") as string;
-  const { error } = await supabase
-    .from("table1")
-    .update({ name, age })
-    .eq("id", params.id);
+  const todos = table1_edit(params.id, {
+    name: formData.get("name") as string,
+    age: formData.get("age") as string,
+  })
+  console.log("garry error todos = ",todos)
   return redirect(`/show/${params.id}`);
 }
 

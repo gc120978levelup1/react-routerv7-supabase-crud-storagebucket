@@ -27,7 +27,9 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 // rrv7 import
 import type { Route } from "./+types/add";
 import { Form, type ActionFunctionArgs, redirect } from "react-router";
-import {supabase, headers} from "../lib/supabase-js"
+import { supabase, headers } from "../lib/supabase-js";
+import { authGuard } from "~/auth/Login";
+import { table1_create } from "~/models/Table1";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -35,23 +37,23 @@ export function meta({}: Route.MetaArgs) {
     { name: "description", content: "Adds 1 item to Table1" },
   ];
 }
-export async function clientLoader({ request }: Route.ClientLoaderArgs) {
+export async function clientLoader({
+  params,
+  request,
+}: Route.ClientLoaderArgs) {
   // middleware to guard route from unauthorized entry
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return redirect("/login");
-  }
+  // authenticity guard
+  const UserIsNotAuthenticated = !(await authGuard());
+  if (UserIsNotAuthenticated) return redirect("/login");
 
   // main query code
+  // add has no starting query
 }
-export async function clientAction({ request }: ActionFunctionArgs) {
+export async function clientAction({ params, request }: ActionFunctionArgs) {
   const formData = await request.formData();
-  const name = formData.get("name") as string;
-  const age = formData.get("age") as string;
-  const { error } = await supabase.from("table1").insert({ name, age });
-  return redirect(`/`);
+  const allData = Object.fromEntries(formData);
+  const todos = await table1_create(allData);
+  if (todos) return redirect(`/show/${todos[0].id}`);
 }
 
 export default function Add() {

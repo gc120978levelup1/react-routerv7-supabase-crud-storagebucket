@@ -39,3 +39,9 @@ const { data, error } = await supabase
   .select('*')
   .like('name', '%Pro%')       // Condition 1: name contains "Pro"
   .like('category', '%Tech%')  // AND Condition 2: category contains "Tech"
+
+
+  ////////////////////////////////////////////////
+
+  put in one folder all the queries including login
+  name it api. so that all queries must be found in one place

@@ -1,0 +1,75 @@
+
+1. Install Supabase CLI using npm, Create a folder
+npm install supabase
+npx supabase init
+npm install supabase --save-dev
+
+2. Open Docker Desktop. 
+   Setings-> Enable, Expose Daemon on tcp://localhost:2375 w/o TLS
+
+   npx supabase start -x logflare --debug
+
+3. Wait for Docker to install everything. Around 11 docker container will be downloaded
+   including pg, supabase admin and supabase servers. When all OK and installed
+
+4. Login to cli, press enter it will launch webapp to give token number to be entered
+   during login. 
+npx supabase login
+
+5. Link to Online supabase project using project code. 
+npx supabase link --project-ref vwvfwocctkedccoksmta
+
+ex,
+VITE_SUPABASE_URL=https://vwvfwocctkedccoksmta.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_rnU92lVz5wMiBZrmMb1CmQ_zQRXdbZQ
+
+therefore, use project reference, vwvfwocctkedccoksmta as parameter
+
+6. pull remote migration file
+npx supabase db pull --remote
+npx supabase migration repair --status reverted 20261122223947 --remote
+npx supabase migration list --remote
+
+the command when ok, produces file in the supabase/migration/384938034.sql
+
+7. open in chrome http://localhost:54322/
+to open local supabase web client
+
+8. goto http://127.0.0.1:54323/project/default/sql
+  SQL edit to copy and paste the sql output of # 6, pull request dump file
+
+9. that time, if all ok the database structure is copied on local pgsql
+
+10. logout/stop 
+supabase db reset
+npx supabase stop --no-backup --debug
+docker ps -aq | xargs docker stop | xargs docker rm
+
+11, Notes: 
+ps_schema=_supabase/public
+pg_user=postgres
+pg_password=postgres
+
+npx supabase db diff -f update_title --local
+npx supabase db dump --remote --data-only --use-copy -f supabase/seed.sql
+npx supabase db dump --linked -f schema.sql
+npx supabase db dump --linked -f data.sql --use-copy --data-only -x "storage.buckets_vectors" -x "storage.vector_indexes"
+npx supabase stop
+npx supabase login
+npx supabase link --project-ref vwvfwocctkedccoksmta
+npx supabase db pull --remote
+
+npx supabase db execute --local -f supabase/schema.sql
+
+docker ps --filter "name=postgres:postgres@localhost:54322/postgres" --format "{{.Names}}"
+
+psql 'postgresql://postgres:postgres@localhost:54322/postgres' -f roles.sql
+psql 'postgresql://postgres:postgres@localhost:54322/postgres' -f schema.sql
+psql 'postgresql://postgres:postgres@localhost:54322/postgres' -f data.sql
+
+docker exec -i <supabase> psql -U postgres -d postgres < roles.sql
+docker exec -i <supabase> psql -U postgres -d postgres < schema.sql
+docker exec -i <supabase> psql -U postgres -d postgres < data.sql
+
+
+docker exec -it <container_name> psql -U <db_user> -c "CREATE DATABASE <db_name>;"

@@ -20,6 +20,9 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 import type { Route } from "./+types/crew_plot_on_duty";
 import { createClientSPA } from "../lib/supabase.client.spa";
 import { redirect } from "react-router";
+import { authGuard } from "~/auth/Login";
+import { supabase } from "~/lib/supabase-js";
+import { crew_index, crew_index_on_duty } from "~/models/Crews";
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "crews Master List Plot" },
@@ -27,18 +30,13 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 export async function clientLoader({ request }: Route.ClientLoaderArgs) {
-  //on_load_page
   // middleware to guard route from unauthorized entry
-  const { supabase, headers } = createClientSPA();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return redirect("/login");
-  }
+  // authenticity guard
+  const UserIsNotAuthenticated = !(await authGuard());
+  if (UserIsNotAuthenticated) return redirect("/login");
 
   // main query code
-  const { data: todos } = await supabase.from("crews").select();
+  const todos = await crew_index_on_duty();
   return { todos };
 }
 
@@ -47,7 +45,9 @@ export default function CrewPlotOnDuty({ loaderData }: Route.ComponentProps) {
   const mapInstanceRef = useRef<LeafletMap | null>(null);
   useEffect(() => {
     // retreive GPS JSON data from local storage
-    const settings = JSON.parse(localStorage.getItem("gpsSettings56867e534646")!);
+    const settings = JSON.parse(
+      localStorage.getItem("gpsSettings56867e534646")!,
+    );
     // ensure that Leaflet map initialization should be done once
     if (!mapContainerRef.current || mapInstanceRef.current) return;
     mapInstanceRef.current = new LeafletMap(mapContainerRef.current).setView(
@@ -61,16 +61,13 @@ export default function CrewPlotOnDuty({ loaderData }: Route.ComponentProps) {
         '&copy; <a href="https://www.google.com/maps/search/">Google Hybrid Map</a>',
     }).addTo(mapInstanceRef.current);
 
-    const { supabase } = createClientSPA();
-    supabase
-      .from("crews")
-      .select().eq("status","onduty")
-      .then(({ data: todos }) => {
-        console.log("garry error todos", todos);
-        todos?.forEach((todo, index) => {
-          const marker = new Marker([todo.ylat, todo.xlon], {
-            alt: todo.callsign,
-          }).addTo(mapInstanceRef.current!).bindPopup(`
+    loaderData.todos?.forEach((todo, index) => {
+      const marker = new Marker([todo.ylat, todo.xlon], {
+        alt: todo.callsign,
+      })
+        .addTo(mapInstanceRef.current!)
+        .bindPopup(
+          `
               <div class=" flex flex-col w-full m-0">
                 <div class=" mt-1">callsign</div>
                 <div class=" text-md font-extrabold">${todo.callsign}</div>
@@ -87,12 +84,13 @@ export default function CrewPlotOnDuty({ loaderData }: Route.ComponentProps) {
                 <div class=" mt-1">description</div>
                 <div class=" text-md font-extrabold">${todo.description}</div>
               </div>
-              `).bindTooltip(`<p class=" font-extrabold">@${todo.callsign}</p>`, {
-              permanent: true,
-              direction: "top",
-            });
+              `,
+        )
+        .bindTooltip(`<p class=" font-extrabold">@${todo.callsign}</p>`, {
+          permanent: true,
+          direction: "top",
         });
-      });
+    });
   }, []);
   return (
     <>

@@ -1,5 +1,6 @@
 // this specific page component import
 // specific component import
+import { supabase } from "~/lib/supabase-js";
 import { Label } from "~/components/ui/label";
 import { Input } from "~/components/ui/input";
 import {
@@ -31,8 +32,12 @@ import {
   useActionData,
   type ActionFunctionArgs,
   redirect,
+  data,
 } from "react-router";
 import { createClientSPA } from "../lib/supabase.client.spa";
+import { authGuard, userAuthGet } from "~/auth/Login";
+import { storageUploadImage } from "~/models/StorageImages";
+import { job_edit } from "~/models/Jobs";
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "User Avatar" },
@@ -41,15 +46,12 @@ export function meta({}: Route.MetaArgs) {
 }
 export async function clientLoader({ params }: Route.LoaderArgs) {
   // middleware to guard route from unauthorized entry
-  const { supabase, headers } = createClientSPA();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return redirect("/login");
-  }
+  // authenticity guard
+  const UserIsNotAuthenticated = !(await authGuard());
+  if (UserIsNotAuthenticated) return redirect("/login");
 
   // main query code
+  const user = await userAuthGet();
   return { user, joId: params.id };
 }
 
@@ -57,17 +59,12 @@ export async function clientAction({ params, request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const file = formData.get("picture");
   if (!(file instanceof File) || file.size === 0) {
-    console.log("garry error file", file);
-    console.log("garry error", "Please select a valid image file.");
+    //console.log("garry error file", file);
+    //console.log("garry error", "Please select a valid image file.");
     return { error: "Please select a valid image file." };
   }
   // Get the authenticated user so uploads go into that user's folder.
-  const { supabase } = createClientSPA();
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-  if (userError) throw userError;
+  const user = await userAuthGet();
   if (!user) throw new Error("Sign in before uploading.");
 
   const extension = file.name.includes(".")
@@ -75,46 +72,17 @@ export async function clientAction({ params, request }: ActionFunctionArgs) {
     : "bin";
   const path = `${user.id}/${crypto.randomUUID()}.${extension}`;
   //const path = `${user.id}/avatar`;
-  console.log("garry error path", path);
+  console.log("garry error path = ", path);
 
   // 1. Upload the file to Supabase Storage
-  const { error: uploadError } = await supabase.storage
-    .from("images") // Replace with your bucket name
-    .upload(path, file, {
-      cacheControl: "0",
-      upsert: true,
-      contentType: file.type, // Explicitly set content type
-    });
+  const todos = await storageUploadImage(file, path);
 
-  console.log("garry error", uploadError);
+  //save public url to jobs table
+  const todos2 = await job_edit(params.id, {
+    afterpicture1: todos.publicUrl,
+  });
 
-  // 2. Retrieve the public URL (for public buckets)
-  const { data } = supabase.storage.from("images").getPublicUrl(path);
-
-  console.log("garry error data", data);
-  // save changes in user settings to local storage
-  if (true) {
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-    if (userError) {
-      console.error(userError.message);
-      return;
-    }
-    if (!user) {
-      return;
-    }
-    //const path = `${user.id}/avatar`;
-    const { data } = supabase.storage.from("images").getPublicUrl(path);
-
-    //save public url to jobs table
-    const { error } = await supabase
-      .from("jobs")
-      .update({ afterpicture1: data.publicUrl })
-      .eq("id", params.id);
-  }
-  return { publicUrl: data.publicUrl };
+  return { publicUrl: todos.publicUrl };
 }
 
 export default function AvatPicture({ loaderData }: Route.ComponentProps) {
@@ -131,7 +99,7 @@ export default function AvatPicture({ loaderData }: Route.ComponentProps) {
                 <BreadcrumbPage>
                   Job Order - After Picture 1, User Email:{" "}
                   <span className=" p-2 bg-blue-950 font-extrabold">
-                    {loaderData.user.email}
+                    {loaderData?.user?.email}
                   </span>
                 </BreadcrumbPage>
               </BreadcrumbItem>
@@ -165,7 +133,7 @@ export default function AvatPicture({ loaderData }: Route.ComponentProps) {
               Upload After Picture 1
             </CardTitle>
             <CardDescription>
-              Edit User: {loaderData.user.email} Edit After Picture 1
+              Edit User: {loaderData.user?.email} Edit After Picture 1
             </CardDescription>
             <CardAction></CardAction>
           </CardHeader>

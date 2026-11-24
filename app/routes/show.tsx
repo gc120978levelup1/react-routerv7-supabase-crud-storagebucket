@@ -27,6 +27,8 @@ import type { Route } from "./+types/show";
 //import { createClientSPA } from "../lib/supabase.client.spa";
 import { supabase, headers } from "../lib/supabase-js";
 import { redirect } from "react-router";
+import { userAuthGet } from "~/auth/Login";
+import { table1_index, table1_index_i } from "~/models/Table1";
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Table1 Show Item" },
@@ -35,19 +37,12 @@ export function meta({}: Route.MetaArgs) {
 }
 export async function clientLoader({ params }: Route.LoaderArgs) {
   // middleware to guard route from unauthorized entry
-  //const { supabase, headers } = createClientSPA();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return redirect("/login");
-  }
+  // authenticity guard
+  const user =  await userAuthGet();
+  if (!user) return redirect("/login");
 
   // main query code
-  const { data: todos } = await supabase
-    .from("table1")
-    .select("*")
-    .eq("id", params.id);
+  const todos = await table1_index_i(params.id)
   return { todos };
 }
 

@@ -31,27 +31,26 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 
 // rrv7 import
 import type { Route } from "./+types/crew_master_list";
-import { createClientSPA } from "../lib/supabase.client.spa";
 import { redirect } from "react-router";
+
+import { authGuard } from "~/auth/Login";
+import { crew_index } from "~/models/Crews";
+
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "crews Master List" },
     { name: "description", content: "crews Master List" },
   ];
 }
+
 export async function clientLoader({ request }: Route.ClientLoaderArgs) {
-  //on_load_page
   // middleware to guard route from unauthorized entry
-  const { supabase, headers } = createClientSPA();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return redirect("/login");
-  }
+  // authenticity guard
+  const UserIsNotAuthenticated = !(await authGuard());
+  if (UserIsNotAuthenticated) return redirect("/login");
 
   // main query code
-  const { data: todos } = await supabase.from("crews").select();
+  const todos = await crew_index()
   return { todos };
 }
 

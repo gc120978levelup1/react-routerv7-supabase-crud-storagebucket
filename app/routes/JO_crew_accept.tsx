@@ -41,58 +41,47 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 
 // rrv7 import
 import type { Route } from "./+types/JO_crew_accept";
-import { createClientSPA } from "../lib/supabase.client.spa";
+
 import { Form, redirect, type ActionFunctionArgs } from "react-router";
+import { authGuard } from "~/auth/Login";
+import { supabase } from "~/lib/supabase-js";
+import { job_edit, job_index_i } from "~/models/Jobs";
+
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Personnel Data" },
     { name: "description", content: "Personnel Data" },
   ];
 }
+
 export async function clientLoader({ params }: Route.LoaderArgs) {
   // middleware to guard route from unauthorized entry
-  const { supabase, headers } = createClientSPA();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return redirect("/login");
-  }
+  // authenticity guard
+  const UserIsNotAuthenticated = !(await authGuard());
+  if (UserIsNotAuthenticated) return redirect("/login");
 
   // main query code
-  const {
-    data: todos,
-    count,
-    error,
-  } = await supabase.from("jobs").select("*").eq("id", params.id);
-  if (!error) {
-    return { todos, count, joId: todos[0].id };
-  }
+  const todos = await job_index_i(params.id);
+  const joId = todos![0].id;
+    return { todos, count:1, joId };
 }
 
 export async function clientAction({ params, request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const status = formData.get("status") as string;
-  const { supabase } = createClientSPA();
   if (status === "new") {
-    await supabase
-      .from("jobs")
-      .update({
+    const job_post = await job_edit(params.id, {
         status: status,
         dateAssigned: null,
         dateAccepted: null,
         crewId: null,
-      })
-      .eq("id", params.id);
+      });
     return redirect(`/JO_show/${params.id}`);
   } else if (status === "accepted") {
-    await supabase
-      .from("jobs")
-      .update({
+    const job_post = await job_edit(params.id, {
         status: status,
         dateAccepted: new Date(),
-      })
-      .eq("id", params.id);
+      });
     return redirect(`/JO_show/${params.id}`);
   }
 }

@@ -18,27 +18,25 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 
 // rrv7 import
 import type { Route } from "./+types/crew_plot_all";
-import { createClientSPA } from "../lib/supabase.client.spa";
 import { redirect } from "react-router";
+import { authGuard } from "~/auth/Login";
+import { crew_index } from "~/models/Crews";
+
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "crews Master List Plot" },
     { name: "description", content: "crews Master List Plot" },
   ];
 }
+
 export async function clientLoader({ request }: Route.ClientLoaderArgs) {
-  //on_load_page
   // middleware to guard route from unauthorized entry
-  const { supabase, headers } = createClientSPA();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return redirect("/login");
-  }
+  // authenticity guard
+  const UserIsNotAuthenticated = !(await authGuard());
+  if (UserIsNotAuthenticated) return redirect("/login");
 
   // main query code
-  const { data: todos } = await supabase.from("crews").select();
+  const todos = await crew_index();
   return { todos };
 }
 
@@ -63,19 +61,13 @@ export default function CrewPlotAll({ loaderData }: Route.ComponentProps) {
         '&copy; <a href="https://www.google.com/maps/search/">Google Hybrid Map</a>',
     }).addTo(mapInstanceRef.current);
 
-    const { supabase } = createClientSPA();
-    supabase
-      .from("crews")
-      .select()
-      .then(({ data: todos }) => {
-        console.log("garry error todos", todos);
-        todos?.forEach((todo, index) => {
-          const marker = new Marker([todo.ylat, todo.xlon], {
-            alt: todo.callsign,
-          })
-            .addTo(mapInstanceRef.current!)
-            .bindPopup(
-              `
+    loaderData.todos?.forEach((todo, index) => {
+      const marker = new Marker([todo.ylat, todo.xlon], {
+        alt: todo.callsign,
+      })
+        .addTo(mapInstanceRef.current!)
+        .bindPopup(
+          `
               <div class=" flex flex-col w-full m-0">
                 <div class=" mt-1">callsign</div>
                 <div class=" text-md font-extrabold">${todo.callsign}</div>
@@ -93,14 +85,14 @@ export default function CrewPlotAll({ loaderData }: Route.ComponentProps) {
                 <div class=" text-md font-extrabold">${todo.description}</div>
               </div>
               `,
-            )
-            .bindTooltip(`<p class=" font-extrabold">@${todo.callsign}</p>`, {
-              permanent: true,
-              direction: "top",
-            });
+        )
+        .bindTooltip(`<p class=" font-extrabold">@${todo.callsign}</p>`, {
+          permanent: true,
+          direction: "top",
         });
-      });
+    });
   }, []);
+
   return (
     <>
       <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">

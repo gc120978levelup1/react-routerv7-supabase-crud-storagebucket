@@ -28,6 +28,9 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 import { Form, type ActionFunctionArgs, redirect } from "react-router";
 import type { Route } from "./+types/delete";
 import { createClientSPA } from "../lib/supabase.client.spa";
+import { authGuard } from "~/auth/Login";
+import { supabase } from "~/lib/supabase-js";
+import { job_delete, job_index_i } from "~/models/Jobs";
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Table1 Delete Item" },
@@ -36,26 +39,19 @@ export function meta({}: Route.MetaArgs) {
 }
 export async function clientLoader({ params }: Route.LoaderArgs) {
   // middleware to guard route from unauthorized entry
-  const { supabase, headers } = createClientSPA();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return redirect("/login");
-  }
+  // authenticity guard
+  const UserIsNotAuthenticated = !(await authGuard());
+  if (UserIsNotAuthenticated) return redirect("/login");
 
   // main query code
-  const { data: todos } = await supabase
-    .from("jobs")
-    .select("*")
-    .eq("id", params.id);
-  return { todos };
+  const todos = await job_index_i(params!.id);
+  return { todos, count:1 };
 }
 
 export async function clientAction({ params }: ActionFunctionArgs) {
-  const { supabase } = createClientSPA();
-  const { error } = await supabase.from("jobs").delete().eq("id", params.id);
-  return redirect(`/`);
+  
+  const todos = await job_delete (params.id);
+  return redirect(`/JO_master`);
 }
 
 export default function JODelete({ loaderData }: Route.ComponentProps) {

@@ -28,6 +28,11 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 import type { Route } from "./+types/password";
 import { Form, type ActionFunctionArgs, redirect } from "react-router";
 import { createClientSPA } from "../lib/supabase.client.spa";
+import { userAuthGet, userUpdate } from "~/auth/Login";
+import type { supabase } from "~/lib/supabase-js";
+import type { error } from "console";
+import { storageGetPublicUrl } from "~/models/StorageImages";
+import { set_store_value, user_settings } from "~/lib/globalVar";
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Change User Display Name" },
@@ -36,13 +41,9 @@ export function meta({}: Route.MetaArgs) {
 }
 export async function clientLoader({ params }: Route.LoaderArgs) {
   // middleware to guard route from unauthorized entry
-  const { supabase, headers } = createClientSPA();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return redirect("/login");
-  }
+  // authenticity guard
+  const user =  await userAuthGet();
+  if (!user) return redirect("/login");
 
   // main query code
   return { user };
@@ -52,18 +53,13 @@ export async function clientAction({ params, request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const display_name = formData.get("display_name") as string;
 
-  const { supabase } = createClientSPA();
   let userId = "";
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await userAuthGet();
   if (user) {
     userId = user.email as string;
   }
-  //console.log("password1", password);
-  //console.log("password2", retype_password);
 
-  const { error } = await supabase.auth.updateUser({
+  const error = await userUpdate({
     email: userId,
     data: {
       display_name: display_name,
@@ -72,33 +68,22 @@ export async function clientAction({ params, request }: ActionFunctionArgs) {
 
   // save changes in user settings to local storage
   if (!error) {
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-    if (userError) {
-      console.error(userError.message);
-      return;
-    }
+    const user = await userAuthGet();
     if (!user) {
       return;
     }
     const path = `${user.id}/avatar`;
-    const { data } = supabase.storage.from("images").getPublicUrl(path);
+    const data  = storageGetPublicUrl(path);
 
-    const settings = {
+    set_store_value(user_settings,{
       name: user.user_metadata?.display_name,
       email: user.email,
       avatar: data.publicUrl,
-    };
-
-    localStorage.setItem("userSettings1234567890", JSON.stringify(settings));
+    });
   }
 
   if (!error) return redirect(`/`);
 
-  //console.log("garry data ", data);
-  //console.log("garry error ", error);
 }
 
 export default function Login({ loaderData }: Route.ComponentProps) {

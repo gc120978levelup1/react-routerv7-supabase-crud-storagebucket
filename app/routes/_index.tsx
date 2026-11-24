@@ -32,7 +32,10 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 // rrv7 import
 import type { Route } from "./+types/_index";
 import { createClientSPA } from "../lib/supabase.client.spa";
-import { redirect } from "react-router";
+import { data, redirect } from "react-router";
+import { authGuard, userAuthGet } from "~/auth/Login";
+import { supabase } from "~/lib/supabase-js";
+import { table1_index } from "~/models/Table1";
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Table1 Master List" },
@@ -40,25 +43,20 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 export async function clientLoader({ request }: Route.ClientLoaderArgs) {
-  //on_load_page
-  // middleware to guard route from unauthorized entry
-  const { supabase, headers } = createClientSPA();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return redirect("/login");
-  }
+  // authenticity guard
+  const UserIsNotAuthenticated = !(await authGuard());
+  if (UserIsNotAuthenticated) return redirect("/login");
 
   // main query code
-  const { data: todos } = await supabase.from("table1").select();
-  return { todos };
+  const todos = await table1_index();
+  return { todos }; // use curly braces to return arrays from a function
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
   return (
     <>
-      <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+      <div className="w-full h-screen bg-red-500"></div>
+      <header className="sticky top-0 bottom-0 z-20 bg-background border-b-2 left-0 flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
         <div className="flex items-center gap-2 px-4">
           <SidebarTrigger className="-ml-1" />
           <Breadcrumb>
@@ -93,7 +91,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {loaderData.todos?.map((todo) => (
+            {loaderData!.todos?.map((todo) => (
               <TableRow key={todo.id}>
                 <TableCell className="font-medium text-right">
                   {todo.id}

@@ -29,6 +29,8 @@ import {
   PieChartIcon,
   MapIcon,
 } from "lucide-react";
+import { authGuard } from "~/auth/Login";
+import { redirect } from "react-router";
 
 // This is sample data.
 const data = {
@@ -341,7 +343,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           });
       }
     };
-    
+
     if (!intID1.current)
       intID1.current = setInterval(() => {
         save_user_gps_data();
@@ -366,8 +368,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     };
     if (!intID2.current)
       intID2.current = setInterval(() => {
-          subscribe_to_user_data();
-          subscribe_to_user_duty_status();
+        subscribe_to_user_data();
+        subscribe_to_user_duty_status();
       }, 1000);
 
     save_user_gps_data();

@@ -26,6 +26,7 @@ import type { Route } from "./+types/login";
 import { Form, type ActionFunctionArgs, redirect } from "react-router";
 //import { createClientSPA } from "../lib/supabase.client.spa";
 import {supabase, headers} from "../lib/supabase-js";
+import { authGuard, userAuthGet, userLogout } from "~/auth/Login";
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Logout Page" },
@@ -35,20 +36,23 @@ export function meta({}: Route.MetaArgs) {
 export async function clientLoader({ params }: Route.LoaderArgs) {
   // middleware to guard route from unauthorized entry
   //const { supabase, headers } = createClientSPA();
+  /*
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) {
     return redirect("/login");
   }
-
+  */
+  const UserIsNotAuthenticated = !(await authGuard());
+  if (UserIsNotAuthenticated) return redirect ("/login");
   // main query code
 }
 
 export async function clientAction({ params, request }: ActionFunctionArgs) {
   //const { supabase } = createClientSPA();
-  const { error } = await supabase.auth.signOut();
-  //console.log("garry error ", error);
+  const error = await userLogout();
+  console.log("garry error user = ", error);
 
   if (!error) return redirect(`/login`);
 }

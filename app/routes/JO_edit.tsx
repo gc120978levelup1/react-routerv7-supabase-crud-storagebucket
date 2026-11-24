@@ -28,7 +28,9 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 // rrv7 import
 import type { Route } from "./+types/JO_edit";
 import { Form, type ActionFunctionArgs, redirect } from "react-router";
-import { createClientSPA } from "../lib/supabase.client.spa";
+import { authGuard } from "~/auth/Login";
+import { job_edit, job_index_i } from "~/models/Jobs";
+
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Table1 Add Item" },
@@ -40,23 +42,15 @@ export async function clientLoader({
   request,
 }: Route.ClientLoaderArgs) {
   // middleware to guard route from unauthorized entry
-  const { supabase, headers } = createClientSPA();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return redirect("/login");
-  }
+  // authenticity guard
+  const UserIsNotAuthenticated = !(await authGuard());
+  if (UserIsNotAuthenticated) return redirect("/login");
 
   // main query code
   // main query code
-  const {
-    data: todos,
-    count,
-    error,
-  } = await supabase.from("jobs").select("*").eq("id", params.id);
-  console.log("garry error todos ", todos);
-  if (!error) return { todos, count };
+  const todos = await job_index_i(params.id);
+  //console.log("garry error todos ", todos);
+  return { todos, count: 1 };
 }
 
 export async function clientAction({ params, request }: ActionFunctionArgs) {
@@ -66,14 +60,13 @@ export async function clientAction({ params, request }: ActionFunctionArgs) {
   const status = "new";
   const dateNew = new Date();
   //const dateNew = now.toString();
-  const { supabase } = createClientSPA();
-  const { error  } = await supabase
-    .from("jobs")
-    .update({ nearAccountNumber, description, status, dateNew }).eq("id",params.id);
-    
-  if (!error) {
-    return redirect(`/JO_show/${params.id}`);
-  }
+  const todo = await job_edit(params.id, {
+    nearAccountNumber,
+    description,
+    status,
+    dateNew,
+  });
+  return redirect(`/JO_show/${params.id}`);
 }
 
 export default function JONew({ loaderData }: Route.ComponentProps) {

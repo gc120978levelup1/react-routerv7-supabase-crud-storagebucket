@@ -28,6 +28,8 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 import { Form, type ActionFunctionArgs, redirect } from "react-router";
 import type { Route } from "./+types/delete";
 import {supabase, headers} from "../lib/supabase-js"
+import { authGuard, userAuthGet } from "~/auth/Login";
+import { table1_delete, table1_index_i } from "~/models/Table1";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -37,23 +39,16 @@ export function meta({}: Route.MetaArgs) {
 }
 export async function clientLoader({ params }: Route.LoaderArgs) {
   // middleware to guard route from unauthorized entry
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return redirect("/login");
-  }
+  // authenticity guard
+  const UserIsNotAuthenticated = !(await authGuard());
+  if (UserIsNotAuthenticated) return redirect("/login");
 
-  // main query code
-  const { data: todos } = await supabase
-    .from("table1")
-    .select("*")
-    .eq("id", params.id);
+  const todos = await table1_index_i(params.id)
   return { todos };
 }
 
 export async function clientAction({ params }: ActionFunctionArgs) {
-  const { error } = await supabase.from("table1").delete().eq("id", params.id);
+  const { error } = table1_delete(params.id);
   return redirect(`/`);
 }
 

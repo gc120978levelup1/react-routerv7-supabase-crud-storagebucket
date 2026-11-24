@@ -55,6 +55,11 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 import type { Route } from "./+types/JO_show";
 import { createClientSPA } from "../lib/supabase.client.spa";
 import { Form, type ActionFunctionArgs, redirect } from "react-router";
+import { authGuard } from "~/auth/Login";
+import { supabase } from "~/lib/supabase-js";
+import type { error } from "console";
+import { id } from "date-fns/locale";
+import { job_edit, job_index_i } from "~/models/Jobs";
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Personnel Data" },
@@ -63,21 +68,13 @@ export function meta({}: Route.MetaArgs) {
 }
 export async function clientLoader({ params }: Route.LoaderArgs) {
   // middleware to guard route from unauthorized entry
-  const { supabase, headers } = createClientSPA();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return redirect("/login");
-  }
+  // authenticity guard
+  const UserIsNotAuthenticated = !(await authGuard());
+  if (UserIsNotAuthenticated) return redirect("/login");
 
   // main query code
-  const {
-    data: todos,
-    count,
-    error,
-  } = await supabase.from("jobs").select("*").eq("id", params.id);
-  return { todos, count };
+  const todos = await job_index_i(params.id)
+  return { todos, count:1 };
 }
 
 export async function clientAction({ params, request }: ActionFunctionArgs) {
@@ -86,11 +83,7 @@ export async function clientAction({ params, request }: ActionFunctionArgs) {
   const dateReported = new Date();
   const jobtype = formData.get("jobtype") as string;
   const reportDescription = formData.get("reportDescription") as string;
-  const { supabase } = createClientSPA();
-  const { error } = await supabase
-    .from("jobs")
-    .update({ jobtype, dateFinished, dateReported, reportDescription })
-    .eq("id", params.id);
+  const todos = await job_edit(params.id, { jobtype, dateFinished, dateReported, reportDescription })
   return redirect(`/JO_show/${params.id}`);
 }
 

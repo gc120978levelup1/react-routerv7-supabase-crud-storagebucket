@@ -28,6 +28,8 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 import type { Route } from "./+types/personnel_data";
 import { createClientSPA } from "../lib/supabase.client.spa";
 import { redirect } from "react-router";
+import { userAuthGet } from "~/auth/Login";
+import { crew_index_email } from "~/models/Crews";
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Personnel Data" },
@@ -36,21 +38,14 @@ export function meta({}: Route.MetaArgs) {
 }
 export async function clientLoader({ params }: Route.LoaderArgs) {
   // middleware to guard route from unauthorized entry
-  const { supabase, headers } = createClientSPA();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return redirect("/login");
-  }
+    // middleware to guard route from unauthorized entry
+  // authenticity guard
+  const user =  await userAuthGet();
+  if (!user) return redirect("/login");
 
   // main query code
-  const {
-    data: todos,
-    count,
-    error,
-  } = await supabase.from("crews").select("*").eq("email", user.email);
-  return { todos, count };
+  const todos = await crew_index_email(user.email)
+  return { todos, count:1, user };
 }
 
 export default function PersonnelData({ loaderData }: Route.ComponentProps) {
