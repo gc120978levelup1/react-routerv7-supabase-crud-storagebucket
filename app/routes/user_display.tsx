@@ -99,7 +99,7 @@ export default function Login({ loaderData }: Route.ComponentProps) {
                 <BreadcrumbPage>
                   My Account - Change User Display name, User Email:{" "}
                   <span className=" p-2 bg-blue-950 font-extrabold">
-                    {loaderData.user.email}
+                    {loaderData.user.email}<span></span>
                   </span>
                 </BreadcrumbPage>
               </BreadcrumbItem>
