@@ -38,6 +38,7 @@ CREATE TABLE "public"."jobs" (
   "dateFinished"      date,
   "reportDescription" text,
   "dateReported"      text,
+  "creator_id"        text,
   CONSTRAINT "jobs_pkey" PRIMARY KEY (id)
 );
 

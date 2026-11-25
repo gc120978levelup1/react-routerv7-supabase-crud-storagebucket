@@ -25,12 +25,23 @@ VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_rnU92lVz5wMiBZrmMb1CmQ_zQRXdbZQ
 
 therefore, use project reference, vwvfwocctkedccoksmta as parameter
 
-6. pull remote migration file
-npx supabase db pull --remote
-npx supabase migration repair --status reverted 20261122223947 --remote
-npx supabase migration list --remote
+6. migration files
 
-the command when ok, produces file in the supabase/migration/384938034.sql
+# remote -> local
+npx supabase migration list --remote
+npx supabase migration repair --status reverted <REMOTE_MIGRATION_VALUE> --remote
+npx supabase db pull --remote
+npx supabase db dump --remote --data-only -f supabase/seed.sql
+npx supabase db reset --local
+npx supabase db dump --remote --data-only --schema auth -f supabase/seed.sql
+npx supabase db reset --local
+
+# local -> remote
+npx supabase db pull --local
+npx supabase db dump --local --data-only -f supabase/seed.sql
+npx supabase db reset --remote
+npx supabase db dump --local --data-only --schema auth -f supabase/seed.sql
+npx supabase db reset --remote
 
 7. open in chrome http://localhost:54322/
 to open local supabase web client
@@ -41,7 +52,6 @@ to open local supabase web client
 9. that time, if all ok the database structure is copied on local pgsql
 
 10. logout/stop 
-supabase db reset
 npx supabase stop --no-backup --debug
 docker ps -aq | xargs docker stop | xargs docker rm
 

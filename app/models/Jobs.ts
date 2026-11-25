@@ -15,6 +15,18 @@ const job_index_i = async (id: any) => {
     return todos.data;
 }
 
+const job_index_crew_id = async (crew_id:any) => {
+    const todos = await supabase.from(tableName).select().eq("crewId", crew_id);
+    //console.log("garry error error = ", todos);
+    return todos.data;
+}
+
+const job_index_creator_id = async (creator_id:any) => {
+    const todos = await supabase.from(tableName).select().eq("creator_id", creator_id);
+    //console.log("garry error error = ", todos);
+    return todos.data;
+}
+
 const job_create = async (payLoadData: Object) => {
     const todos = (await supabase.from(tableName).insert(payLoadData).select());
     //console.log("garry error error = ", todos);
@@ -39,8 +51,10 @@ const job_delete = async (id: any) => {
 
 export { 
     job_index, 
-    job_index_i, 
+    job_index_i,
+    job_index_creator_id, 
+    job_index_crew_id,
     job_create, 
     job_edit, 
-    job_delete 
+    job_delete, 
 }

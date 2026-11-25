@@ -31,7 +31,7 @@ import {
 import { SidebarTrigger } from "~/components/ui/sidebar";
 
 // rrv7 import
-import type { Route } from "./+types/_index";
+import type { Route } from "./+types/JO_master";
 
 import { redirect } from "react-router";
 import { authGuard } from "~/auth/Login";

@@ -106,8 +106,12 @@ const data = {
           url: "/JO_new",
         },
         {
-          title: "List of My Job Order",
-          url: "#",
+          title: "My Assigned Job Orders",
+          url: "/JO_master_me",
+        },
+        {
+          title: "My Created Job Orders",
+          url: "/JO_master_me_created",
         },
         {
           title: "Plot All of my Job Orders",

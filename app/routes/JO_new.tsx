@@ -28,10 +28,11 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 // rrv7 import
 import type { Route } from "./+types/JO_new";
 import { Form, type ActionFunctionArgs, redirect } from "react-router";
-//import { createClientSPA } from "../lib/supabase.client.spa";
-import { authGuard } from "~/auth/Login";
+import { authGuard, userAuthGet } from "~/auth/Login";
 //import { error } from "console";
 import { job_create } from "~/models/Jobs";
+import { crew_index_email } from "~/models/Crews";
+
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Table1 Add Item" },
@@ -41,15 +42,19 @@ export function meta({}: Route.MetaArgs) {
 export async function clientLoader({ request }: Route.ClientLoaderArgs) {
   // middleware to guard route from unauthorized entry
   // authenticity guard
-  const UserIsNotAuthenticated = !(await authGuard());
-  if (UserIsNotAuthenticated) return redirect("/login");
+  const user = await userAuthGet();
+  if (!user) return redirect("/login")
 
   // main query code
+  const todos = await crew_index_email(user.email);
+  return {todos};
 }
 
 export async function clientAction({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
+  console.log("garry error creator_id = ",formData.get("creator_id") as string);
   const todos = await job_create({
+    creator_id: formData.get("creator_id") as string,
     nearAccountNumber: formData.get("nearAccountNumber") as string,
     description: formData.get("description") as string,
     status: "new",
@@ -60,7 +65,7 @@ export async function clientAction({ request }: ActionFunctionArgs) {
   }
 }
 
-export default function JONew() {
+export default function JONew(loaderData: Route.ComponentProps) {
   return (
     <>
       <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
@@ -93,6 +98,16 @@ export default function JONew() {
           </CardHeader>
           <CardContent className=" bg-gray-900/30 py-10 m-2">
             <div className="mx-10 gap-6 flex flex-col">
+              <div className="hidden">
+                <Label htmlFor="creator_id">creator</Label>
+                <Input
+                  type="text"
+                  name="creator_id"
+                  id="creator_id"
+                  defaultValue={loaderData.matches[2].loaderData.todos![0].id}
+                  readOnly
+                />
+              </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="nearAccountNumber">nearAccountNumber</Label>
                 <Input

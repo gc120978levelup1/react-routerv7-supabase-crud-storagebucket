@@ -21,12 +21,14 @@ import type { Route } from "./+types/crew_plot_on_map";
 import { redirect } from "react-router";
 import { authGuard } from "~/auth/Login";
 import { crew_index_i } from "~/models/Crews";
+
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "crews Master List Plot" },
     { name: "description", content: "crews Master List Plot" },
   ];
 }
+
 export async function clientLoader({ params }: Route.LoaderArgs) {
   // middleware to guard route from unauthorized entry
   // authenticity guard

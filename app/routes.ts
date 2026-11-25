@@ -18,8 +18,10 @@ export default [
         route("crew_plot_on_map/:id","routes/crew_plot_on_map.tsx"),
         route("crew_show_data/:id","routes/crew_show_data.tsx"),
 
-        route("JO_new","routes/JO_new.tsx"),
         route("JO_master","routes/JO_master.tsx"),
+        route("JO_new","routes/JO_new.tsx"),
+        route("JO_master_me","routes/JO_master_me.tsx"),
+        route("JO_master_me_created","routes/JO_master_me_created.tsx"),
         route("JO_show/:id","routes/JO_show.tsx"),
         route("JO_edit/:id","routes/JO_edit.tsx"),
         route("JO_delete/:id","routes/JO_delete.tsx"),

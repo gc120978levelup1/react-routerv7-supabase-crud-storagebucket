@@ -10,7 +10,6 @@
 `)
 
 # Left JOIN supabase:
-
 const { data, error } = await supabase
   .from('posts')
   .select(`
@@ -40,6 +39,13 @@ const { data, error } = await supabase
   .like('name', '%Pro%')       // Condition 1: name contains "Pro"
   .like('category', '%Tech%')  // AND Condition 2: category contains "Tech"
 
+# or and
+/ Chained filters (AND) + .or()
+const { data, error } = await supabase
+  .from('items')
+  .select('*')
+  .eq('is_published', true)
+  .or('category.eq.books,category.eq.games')
 
   ////////////////////////////////////////////////
 
